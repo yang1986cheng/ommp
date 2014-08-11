@@ -2,10 +2,8 @@
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, RequestContext
 from django.views.decorators.csrf import csrf_protect
-import hike.deploy.base as base
-import models
+import ommp.deploy.base as base
 import json
-import os
 
 def index(request):
     return render_to_response('test.html')
@@ -63,7 +61,7 @@ def view_logs(request):
     '''
     hand log view request
     '''
-    import hike.functions.base as fb
+    import ommp.functions.base as fb
     if request.method == 'POST':
         action = request.POST.get('action', '')
         project = request.POST.get('project', '')

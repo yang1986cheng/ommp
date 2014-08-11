@@ -32,6 +32,7 @@
     color: #5a5a5a;
     padding: 0 0 0 15px;
     letter-spacing: 2px;
+    margin-left: 15px;
 }
 
 .f_menu a:hover{
@@ -40,5 +41,6 @@
     font:normal 14px/14px "Microsoft YaHei";
     color: orange;
     padding: 0 0 0 15px;
+    margin-left: 15px;
 }
 

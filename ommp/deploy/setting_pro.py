@@ -52,3 +52,11 @@ BBS_CONF = {'exclude' : ['.git', '.gitignore', 'config.py', 'fabfile.py', 'data/
             'verification' : 'admin',
             'script' : '/app/webapps/pre_bbs.sh',
             }
+
+MOBILE_CONF = {'exclude' : ['.git', '.gitignore', 'config.py', 'fabfile.py', 'admin', 'admin.php'], 
+            'hosts' : ['10.169.0.64'],
+            'resource' : '/app/webapps/hike_m',
+            'target' : '/app/webapps/hike_m', 
+            'verification' : 'admin',
+            'script' : '/app/webapps/pre_mobile.sh',
+            }

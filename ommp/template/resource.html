@@ -1,9 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="/static/django_post.js"></script>
+    <link rel="stylesheet" href="/static/resource.css"/>
+    <script type="text/javascript" src="/static/jquery-2-1-1.js"></script>
+    <script type="text/javascript" src="/static/resource.js"></script>
     <title></title>
 </head>
 <body>
-resources
+    <div class="add-idc">
+        <div class="add-title">添加新机房</div>
+        <div class="add-form-div">
+            <form class="add-form">
+                {% csrf_token %}
+                <div class="add-form-list">
+                    <label class="label-front">机房名称：</label>
+                    <input type="text" class="add-form-text" name="idc-name">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">省份：</label>
+                    <input type="text" class="add-form-text" name="provinces">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">城市：</label>
+                    <input type="text" class="add-form-text" name="city">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">区县：</label>
+                    <input type="text" class="add-form-text" name="county">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">街道：</label>
+                    <input type="text" class="add-form-text" name="address">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">邮编：</label>
+                    <input type="text" class="add-form-text" name="zipcode">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">联系人：</label>
+                    <input type="text" class="add-form-text" name="contact">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">联系电话：</label>
+                    <input type="text" class="add-form-text" name="phone">
+                </div>
+                <div class="add-form-list">
+                    <label class="label-front">联系邮件：</label>
+                    <input type="text" class="add-form-text" name="email">
+                </div>
+                <div class="add-form-button">
+                    <input type="button" value="确认添加" class="add-submit">
+                    <input type="button" value="放弃添加" class="add-cancel">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="mask"></div>
+    <div class="top_title">
+        <h1>{{ top_title }}</h1>
+    </div>
+    <div class="idc-main">
+        {% for idc in idcs %}
+            <div class="idc-item"><input type="hidden" name="{{idc.id}}">机房：{{idc.idc_name}}<br>地址：{{idc.display_addr}}<br>联系人：{{idc.contact}}<br>电话：{{idc.phone_num}}</div>
+        {% endfor %}
+        <!--<div class="idc-item">机房：广东河源<br>地址：河源工业源<br>联系人：胡财<br>电话：18684030907</div>-->
+        <!--<div class="idc-item">机房：广东河源<br>地址：河源工业源<br>联系人：胡财<br>电话：18684030907</div>-->
+        <!--<div class="idc-item">机房：广东河源<br>地址：河源工业源<br>联系人：胡财<br>电话：18684030907</div>-->
+        <!--<div class="idc-item">机房：广东河源<br>地址：河源工业源<br>联系人：胡财<br>电话：18684030907</div>-->
+        <!--<div class="idc-item">机房：广东河源<br>地址：河源工业源<br>联系人：胡财<br>电话：18684030907</div>-->
+        <!--<div class="idc-item">机房：广东河源<br>地址：河源工业源<br>联系人：胡财<br>电话：18684030907</div>-->
+        <div class="idc-noitem"></div>
+    </div>
 </body>
 </html>

@@ -5,12 +5,14 @@ from django.conf.urls import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-                       url(r'^$', 'hike.views.index'),
-                       url(r'^deployment/side/$', 'hike.views.side'),
-                       url(r'^deployment/welcome/$', 'hike.views.welcome'),
-                       url(r'^deployment/deploy-php/$', 'hike.views.deploy'),
-                       url(r'^deployment/$', 'hike.views.deploy_index'),
-                       url(r'^functions/logs/$', 'hike.views.view_logs'),
+                       url(r'^$', 'ommp.views.index'),
+                       url(r'^deployment/side/$', 'ommp.views.side'),
+                       url(r'^deployment/welcome/$', 'ommp.views.welcome'),
+                       url(r'^deployment/deploy-php/$', 'ommp.views.deploy'),
+                       url(r'^deployment/$', 'ommp.views.deploy_index'),
+                       url(r'^functions/logs/$', 'ommp.views.view_logs'),
+                       url(r'^resource/idc/$', 'ommp.resources.views.list_idc'),
+                       url(r'^resource/add-idc/$', 'ommp.resources.views.add_idc'),
     # Examples:
     # url(r'^$', 'hike.views.home', name='home'),
     # url(r'^hike/', include('hike.foo.urls')),

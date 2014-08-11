@@ -1,4 +1,4 @@
-# Django settings for hike project.
+# Django settings for OMMP project.
 import os
 
 
@@ -15,7 +15,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'hike_os',                      # Or path to database file if using sqlite3.
+        'NAME': 'ommp',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'root',
         'PASSWORD': 'root',
@@ -72,7 +72,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-                    '%s/hike/static' % (os.getcwd()),
+                    '%s/ommp/static' % (os.getcwd()),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -108,13 +108,13 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',cc
 )
 
-ROOT_URLCONF = 'hike.urls'
+ROOT_URLCONF = 'ommp.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'hike.wsgi.application'
+WSGI_APPLICATION = 'ommp.wsgi.application'
 
 TEMPLATE_DIRS = (
-                 '%s/hike/template' % (os.getcwd()),
+                 '%s/ommp/template' % (os.getcwd()),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'hike',
+    'ommp',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
