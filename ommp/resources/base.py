@@ -8,10 +8,11 @@ def get_post_val(request):
            'contact' : request.get('contact', ''),
            'phone' : request.get('phone', ''),
            'email' : request.get('email', ''),
-           'idc-name' : request.get('idc-name', ''),
+           'idc_name' : request.get('idc-name', ''),
            'provinces' : request.get('provinces', ''),
            'county' : request.get('county', ''),
            'city' : request.get('city', ''),
+           'end_date' : request.get('end-date', ''),
            }
     return val
 
@@ -24,7 +25,19 @@ def dump_json(code):
     elif code ==1:
         status = 'Failed'
     raw_json = {'status': status, 'code' : code,}
-    
+
     return json.dumps(raw_json)
     
-    
+def get_idc_json(obj):
+    val = {'id' : obj.id,
+           'address' : obj.address,
+           'zipcode' : obj.zipcode,
+           'contact' : obj.contact,
+           'phone' : obj.phone,
+           'email' : obj.email,
+           'idc-name' : obj.idc_name,
+           'provinces' : obj.provinces,
+           'county' : obj.county,
+           'city' : obj.city,
+           }
+#    

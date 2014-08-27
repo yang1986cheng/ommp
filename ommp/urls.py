@@ -13,6 +13,7 @@ urlpatterns = patterns('',
                        url(r'^functions/logs/$', 'ommp.views.view_logs'),
                        url(r'^resource/idc/$', 'ommp.resources.views.list_idc'),
                        url(r'^resource/add-idc/$', 'ommp.resources.views.add_idc'),
+                       url(r'resource/idc-detail/$', 'ommp.resources.views.get_idc_detail'),
     # Examples:
     # url(r'^$', 'hike.views.home', name='home'),
     # url(r'^hike/', include('hike.foo.urls')),

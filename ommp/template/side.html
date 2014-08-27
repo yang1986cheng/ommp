@@ -2,41 +2,80 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href=/static/side.css/>
+    <link rel="stylesheet" type="text/css" href="/static/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="/static/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="/static/left.css">
+    <script type="text/javascript" src="/static/jquery-2-1-1.js"></script>
+    <script type="text/javascript" src="/static/easyui/jquery.easyui.min.js"></script>
+    <title></title>
 </head>
-<body class="navbar">
+<body>
 <div class="navbarlogo">
     <img src=/static/images/logo.jpg>
 </div>
-
-<div class="navsection">
-    <div class="navsectiontitle">资源管理</div>
-    <ul class="f_menu">
-        <li><a target="main" href="/resource/idc/">机房管理</a></li>
-        <li><a target="main" href="/deployment/resource">机柜管理</a></li>
-        <li><a target="main" href="/deployment/resource">机器管理</a></li>
-        <li><a target="main" href="/deployment/resource">IP管理</a></li>
-    </ul>
-</div>
-<div class="navsection">
-    <div class="navsectiontitle">项目管理</div>
-    <ul class="f_menu">
-        <li><a target="main" href="/deployment/projects">项目管理</a></li>
-
-    </ul>
-</div>
-<div class="navsection">
-    <div class="navsectiontitle">部署管理</div>
-    <ul class="f_menu">
-        <li><a target="main" href="/deployment/deploy-php">PHP部署</a></li>
-        <li><a target="main" href="/deployment/deploy-java">JAVA部署</a></li>
-    </ul>
-</div>
-<div class="navsection">
-    <div class="navsectiontitle">常用功能</div>
-    <ul class="f_menu">
-        <li><a target="main" href="/functions/logs/">JAVA日志查看</a></li>
-    </ul>
-</div>
+<div class="easyui-accordion" style="width: 250px;top: 30px;overflow: hidden;padding: 0px; margin: 0px">
+    <div title="资源管理">
+        <a target="main" target="main" href="/resource/idc/" class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">机房管理</span>
+            <span class="m-btn-line"></span>
+        </a>
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">机柜管理</span>
+            <span class="m-btn-line"></span>
+        </a>
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">服务器管理</span>
+            <span class="m-btn-line"></span>
+        </a>
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">密码管理</span>
+            <span class="m-btn-line"></span>
+        </a>
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">IP管理</span>
+            <span class="m-btn-line"></span>
+        </a>
+    </div>
+    <div title="项目管理">
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">项目列表</span>
+            <span class="m-btn-line"></span>
+        </a>
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">新建项目</span>
+            <span class="m-btn-line"></span>
+        </a>
+    </div>
+    <div title="任务管理">
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">任务列表</span>
+            <span class="m-btn-line"></span>
+        </a>
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">新建任务</span>
+            <span class="m-btn-line"></span>
+        </a>
+    </div>
+    <div title="常用功能">
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">JAVA日志查看</span>
+            <span class="m-btn-line"></span>
+        </a>
+        <a target="main" href="#"class="l-width-cl l-btn l-btn-small l-btn-plain m-btn m-btn-small">
+            <span class="l-btn-left" style="margin-top: 0px;"></span>
+            <span class="l-btn-text">MySQL-Binlog分析</span>
+            <span class="m-btn-line"></span>
+        </a>
+    </div>
 </body>
 </html>

@@ -53,13 +53,13 @@ body {
 .add-idc {
     width: 600px;
     height: 400px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin: -200px 0 0 -300px;
-    z-index: 3;
-    display: none;
-    background-color: #1a9790;
+    /*position: absolute;*/
+    /*top: 50%;*/
+    /*left: 50%;*/
+    /*margin: -200px 0 0 -300px;*/
+    /*z-index: 3;*/
+    /*display: none;*/
+    /*background-color: #1a9790;*/
 }
 
 .mask {
@@ -89,7 +89,47 @@ body {
     margin-top: 10px;
 }
 
+#idc-detail {
+    overflow: hidden;
+    padding: 0 5px;
+}
 
+.add-idc-form-sty {
+    margin-top: 5px;
+    width: 100%;
+}
+
+.idc-detail-form-div{
+    float: left;
+    width: 150px;
+    height: 100%;
+}
+
+.idc-detail-list {
+    margin-top: 10px;
+}
+
+.textbox,.textbox-invalid,.numberbox{
+    margin-top: 5px;
+    width: 100% !important;
+}
+
+.add-idc-form-lab {
+    margin-top: 10px;
+}
+
+
+#add-idc-div{
+    overflow: hidden;
+    padding: 0 5px;
+}
+
+.idc-detail-right-div {
+    width: 600px;
+    height: 300px;
+    float: left;
+    margin-left: 15px;
+}
 
 
 

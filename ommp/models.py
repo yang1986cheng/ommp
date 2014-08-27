@@ -13,6 +13,7 @@ class IDCs(models.Model):
     email = models.EmailField(max_length = 50)
     code = models.IntegerField(max_length = 6)
     add_time = models.DateTimeField()
+    end_date = models.CharField(max_length = 10)
     
 class Cabinets(models.Model):
     idc = models.ForeignKey(IDCs)

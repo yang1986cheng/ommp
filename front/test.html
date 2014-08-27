@@ -1,0 +1,22 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+<script type="text/javascript" src="easyui/jquery.min.js"></script>
+<script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+</head>
+<body>
+<div id="content" class="easyui-panel" style="height:200px"
+        data-options="href:'show_content.php?page=1'">
+</div>
+<div class="easyui-pagination" style="border:1px solid #ccc;"
+        data-options="
+            total: 2000,
+            pageSize: 10,
+            pageList: [10,20,70,100],
+            onSelectPage: function(pageNumber, pageSize){
+                $('#content').panel('refresh', 'show_content.php?page='+pageNumber);
+            }">
+</div>
+</body>
+</html>
