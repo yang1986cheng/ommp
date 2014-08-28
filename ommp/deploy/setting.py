@@ -1,6 +1,6 @@
 #coding: utf-8
-JENERAL_CONF = {'username' : 'ckt', 
-                'password' : '123qwe',
+JENERAL_CONF = {'username' : '', 
+                'password' : '',
                 'port' : 22,
                 }
 
