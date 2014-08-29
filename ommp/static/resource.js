@@ -23,6 +23,7 @@ $(document).ready(function() {
                     $('#idc-detail-email').attr('value',data['email']);
                     $('#idc-detail-date').datebox('setValue',data['end_date']);
                     $('#idc-detail-address').attr('value',data['address']);
+                    $('#idc-detaid-idc-id').attr('value',data['id'])
                     $('.idc-detail-list input').each(function() {$(this).attr('disabled', 'true')})
 
                     idc_name = "机房详情-" + data['idc_name']
@@ -81,8 +82,7 @@ $(document).ready(function() {
             text:'修改',
             iconCls:'icon-edit',
             handler:function() {
-                $('.idc-detail-list input').each(function() {$(this).removeAttr('disabled')}),
-                $()
+                $('.idc-detail-list input').each(function() {$(this).removeAttr('disabled')})
             }
         },'-',{
             text:'保存',
@@ -90,21 +90,34 @@ $(document).ready(function() {
             handler:function(){
                 $('.idc-detail-list input').each(function() {$(this).attr('disabled', 'true')}),
                     $.post("/resource/add-idc/",
-                    $("form.add-form").serialize(),
-                    $("form.add-form").serialize(),
-                    function(data, status) {
-                        if (status == "success") {
-                            alert("修改成功!")
-                            parent.location.reload();
-                        } else {
-                            alert("添加失败!")
-                        }
-                    })
+                        $("form.add-form").serialize(),
+                        function(data, status) {
+                            if (status == "success") {
+                                alert("修改成功!")
+                                parent.location.reload();
+                            } else {
+                                alert("添加失败!")
+                            }
+                        })
             }
         },'-',{
-           text:'删除',
+            text:'删除',
             iconCls:'icon-no',
-            handler:function() {check_confirm('删除确认', '确定要删除该机房？<br><br>该操作不可撤销')}
+            handler:function() {
+                $.messager.confirm('删除确认', '请确认需要删除该机房信息!<br><br>该操作将不可撤销!', function(r){
+                    if (r){
+                        var id= $('#idc-detaid-idc-id').val()
+                        $.post('/resource/del-idc/',
+                        {'idc-id':id},
+                        function(data, status) {
+                            if(status == 'success' && data['status'] == 'success') {
+                                alert("删除成功!")
+                                parent.location.reload()
+                            } else {alert("删除失败，请重试!")}
+                        })
+                    }
+                });
+            }
         }],
         buttons:[{
             text:'OK',
@@ -123,12 +136,4 @@ function open_add_idc_div() {
 
 function close_add_idc_div() {
     $('#add-idc-div').window('close');
-}
-
-function check_confirm(title, message){
-    $.messager.confirm(title, message + '！', function(r){
-        if (r){
-            alert('confirmed:'+r);
-        }
-    });
 }

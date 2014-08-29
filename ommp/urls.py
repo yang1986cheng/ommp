@@ -14,6 +14,8 @@ urlpatterns = patterns('',
                        url(r'^resource/idc/$', 'ommp.resources.views.list_idc'),
                        url(r'^resource/add-idc/$', 'ommp.resources.views.add_idc'),
                        url(r'resource/idc-detail/$', 'ommp.resources.views.get_idc_detail'),
+                       url(r'resource/del-idc/$', 'ommp.resources.views.del_idc'),
+                       url(r'resource/update-idc/$', 'ommp.resources.views.update_idc_info'),
     # Examples:
     # url(r'^$', 'hike.views.home', name='home'),
     # url(r'^hike/', include('hike.foo.urls')),

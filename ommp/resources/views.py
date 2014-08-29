@@ -59,6 +59,40 @@ def get_idc_detail(request):
                'end_date' : 'idc_info.end_date',
                }
         return HttpResponse(json.dumps(items), content_type="application/json")
+    
+@csrf_protect
+def update_idc_info(request):
+    pass
+
+@csrf_protect
+def del_idc(request):
+
+    if request.method == 'POST':
+        idc_id = request.POST.get('idc-id', '')
+        if idc_id:
+            idc = IDCs.objects.get(id = idc_id)
+            raw_json = {'status' : 'success'} if idc.delete() == None else {'status' : 'failed'}
+            return HttpResponse(json.dumps(raw_json), content_type="application/json")
+            
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
         
         
