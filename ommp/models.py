@@ -1,5 +1,6 @@
 #coding: utf-8
 from django.db import models
+from django.contrib.auth.models import User
 
 class IDCs(models.Model):
     '''
@@ -16,9 +17,14 @@ class IDCs(models.Model):
     end_date = models.CharField(max_length = 10)
     
 class Cabinets(models.Model):
+    name = models.CharField(max_length = 30)
     idc = models.ForeignKey(IDCs)
-    identifier = models.CharField(max_length = 30)
-    height = models.IntegerField(max_length = 2)
+    admin = models.ForeignKey(User)
+    size = models.CharField(max_length = 30)
+    add_date = models.CharField(max_length = 10)
+    end_date = models.CharField(max_length = 10)
+    servers = models.IntegerField(max_length = 2)
+    available = models.IntegerField(max_length = 1)
     
 class Projects(models.Model):
     '''

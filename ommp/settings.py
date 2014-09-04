@@ -129,7 +129,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'ommp',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -162,3 +162,6 @@ LOGGING = {
         },
     }
 }
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+LOGIN_REDIRECT_URL = '/management/'

@@ -94,11 +94,11 @@
     <div id="idc-detail">
         <div class="idc-detail-form-div">
             <form class="idc-detail-form">
-                <!--{% csrf_token %}-->
+                {% csrf_token %}
                 <input id='idc-detaid-idc-id' type="hidden" name='idc_id'>
                 <div class="idc-detail-list">
                     <label class="label-front">机房名称：</label>
-                    <input id='idc-detail-name' type="text" class="easyui-validatebox add-idc-form-sty" data-options="required:true" name="idc_name">
+                    <input id='idc-detail-name' type="text" class="easyui-validatebox add-idc-form-sty" data-options="required:true" name="idc-name">
                 </div>
                 <div class="idc-detail-list">
                     <label class="label-front">邮编：</label>

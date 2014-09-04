@@ -13,6 +13,8 @@ def get_post_val(request):
            'county' : request.get('county', ''),
            'city' : request.get('city', ''),
            'end_date' : request.get('end-date', ''),
+           'idc_id' : request.get('idc_id', ''),
+           'address' : request.get('address', '')
            }
     return val
 
@@ -21,9 +23,9 @@ def get_datetime():
 
 def dump_json(code):
     if code == 0:
-        status = 'OK'
+        status = 'success'
     elif code ==1:
-        status = 'Failed'
+        status = 'failed'
     raw_json = {'status': status, 'code' : code,}
 
     return json.dumps(raw_json)
@@ -40,4 +42,28 @@ def get_idc_json(obj):
            'county' : obj.county,
            'city' : obj.city,
            }
-#    
+    
+def check_post_val(*args):
+    x = True
+    for i in args:
+        if not i:
+            x = False
+            break
+    return x
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -47,7 +47,7 @@ $(document).ready(function() {
         buttons:[{
             text:'Add',
             iconCls:'icon-add',
-            handler:function() {
+            handler:function() { 
                 $.post("/resource/add-idc/",
                     $("form.add-form").serialize(),
                     function(data, status) {
@@ -82,21 +82,24 @@ $(document).ready(function() {
             text:'修改',
             iconCls:'icon-edit',
             handler:function() {
+            	$('#save-change').linkbutton('enable');
                 $('.idc-detail-list input').each(function() {$(this).removeAttr('disabled')})
             }
         },'-',{
+        	id:'save-change',
             text:'保存',
             iconCls:'icon-save',
+            disabled:true,
             handler:function(){
-                $('.idc-detail-list input').each(function() {$(this).attr('disabled', 'true')}),
-                    $.post("/resource/add-idc/",
-                        $("form.add-form").serialize(),
+            		$('#save-change').linkbutton('disable');
+                    $.post("/resource/update-idc/",
+                        $("form.idc-detail-form").serialize(),
                         function(data, status) {
-                            if (status == "success") {
+                            if (status == "success" && data['status'] == 'success') {
                                 alert("修改成功!")
                                 parent.location.reload();
                             } else {
-                                alert("添加失败!")
+                                alert("修改失败!")
                             }
                         })
             }

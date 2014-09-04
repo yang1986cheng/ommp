@@ -80,3 +80,7 @@ $(document).ready(function() {
         }
     })
 })
+
+function cancel_login() {
+    $('#login_form').form('clear')
+}

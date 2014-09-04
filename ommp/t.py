@@ -1,3 +1,7 @@
 import datetime
 
-print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+x = ''
+if x:
+    print 'xxx'
+else:
+    print "asdf"
