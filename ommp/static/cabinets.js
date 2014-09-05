@@ -1,7 +1,7 @@
 $(document).ready(function(){
     $('#cb-display-table').datagrid({
         url:'/resource/get-cabs/',
-        title:'服务器列表',
+        title:'机柜列表',
         fit:true,
         iconCls:'icon-filter',
         fitColumns:true,
