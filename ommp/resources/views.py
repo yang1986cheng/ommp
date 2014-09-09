@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 import json
 import base
-from ommp.models import IDCs, Cabinets
+from ommp.models import IDCs, Cabinets, Servers
 import datetime
 
 @csrf_protect
@@ -148,8 +148,111 @@ def del_idc(request):
 def servers(request):
     return render_to_response('servers.html', context_instance=RequestContext(request))
 
+@csrf_protect
+@login_required
+def add_server(request):
+    po = request.POST
+    name = po.get('svr-name', '')
+    idc = po.get('svr-add-idc', '')
+    cabinets = po.get('svr-add-cab', '')
+    size = po.get('svr-size', '')
+    parts = po.get('svr-parts', '')
+    add_date = base.get_now_date()
+    end_date = po.get('svr-end-date', '')
+    father = po.get('svr-add-father', '')
+    used_type = po.get('svr-add-usable', '')
+    admin = po.get('svr-add-admin', '')
+    os = po.get('svr-add-os', '')
+    
+    father = Servers.objects.get(id = father) if father else None
+        
+    if not base.check_post_val(name, idc, cabinets, size, parts, end_date, used_type, admin, os):
+        raise Http404
+    
+    idc = IDCs.objects.get(id = idc)
+    cabinets = Cabinets.objects.get(id = cabinets)
+    admin = User.objects.get(id = admin)
+    
+    svr = Servers(name = name,
+                  idc = idc,
+                  cabinets = cabinets,
+                  size = size,
+                  add_date = add_date,
+                  parts = parts,
+                  end_date = end_date,
+                  father = father,
+                  used_type = used_type,
+                  admin = admin,
+                  os = os,
+                  )
+    raw_json = {'status' : 'success'} if svr.save() == None else {'status' : 'failed'}
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
+    
+    
 
+@csrf_protect
+@login_required
+def get_servers(request):
+    page = int(request.REQUEST.get('page', ''))
+    rows = int(request.REQUEST.get('rows', ''))
+    r_from = (page - 1) * rows
+    cab = request.REQUEST.get('cab', '')
+    cb_list = []
+    if cab:
+        n = 0
+        svrs = Servers.objects.filter(cabinets = cab)
+        for svr in svrs:
+            c = {'id' : svr.id, 'name' : svr.name, 'selected' : 'true'} if n == 0 else {'id' : svr.id, 'name' : svr.name}
+            cb_list.append(c)
+            n += 1
+        return HttpResponse(json.dumps(cb_list), content_type="application/json")
+    else:
+        svrs = Servers.objects.all()[r_from:r_from + rows]
+        cb_total = Servers.objects.count()
+        for svr in svrs:
+            svr_father = "无" if svr.father == None else svr.father.name
+            
+            type = svr.used_type
+            if type == 0:
+                used_type = '测试'
+            elif type == 1:
+                used_type = '生产'
+            elif type == 2:                             
+                used_type = '不可用'               
+                
+            r = {'svr-id' : svr.id,
+                 'cab-id' : svr.cabinets.id,
+                 'admin-id' : svr.admin.id,
+                 'svr-used-type' : svr.used_type,
+                 'svr-name' : svr.name,
+                 'idc-name' : svr.idc.idc_name,
+                 'cab-name' : svr.cabinets.name,
+                 'svr-size' : svr.size,
+                 'svr-parts' : svr.parts,
+                 'svr-os' : svr.os,
+                 'storage-date' : svr.add_date,
+                 'end-date' : svr.end_date,
+                 'father-server' : svr_father,
+                 'svr-usable' : used_type,
+                 'admin-name' : svr.admin.username
+                 }
+            cb_list.append(r)
+        raw_json = {'total' : cb_total, "rows" : cb_list}
+        return HttpResponse(json.dumps(raw_json), content_type="application/json")
 
+@csrf_protect
+@login_required   
+def del_server(request):
+    sid = request.REQUEST.get('sid', '')
+    if not sid:
+        raise Http404
+    
+    if Servers.objects.filter(father = sid).count() > 0:
+        raw_json = {'status' : 'failed', 'data' : 'Have child, can\'t delete'}
+        return HttpResponse(json.dumps(raw_json), content_type="application/json")
+    
+    raw_json = {'status' : 'success'} if Servers.objects.filter(id = sid).delete() == None else {'status' : 'failed'}
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
 
 #action about cabinets
 def cabinets(request):
@@ -164,7 +267,7 @@ def add_cabinet(request):
         idc = po.get('cb-add-idc', '')
         admin = po.get('cb-add-admin', '')
         size = po.get('cb-size', '')
-        add_date = datetime.date.today().strftime('%m/%d/%Y')
+        add_date = base.get_now_date()
         end_date = po.get('cb-end-date', '')
         servers = 0
         available = po.get('cb-add-usable', '')
@@ -184,7 +287,7 @@ def add_cabinet(request):
                       servers = servers,
                       available = available)
         
-        raw_json = {'status' : 'success'} if cb.save() > 0 else {'status' : 'failed'}
+        raw_json = {'status' : 'success'} if cb.save() == None else {'status' : 'failed'}
         return HttpResponse(json.dumps(raw_json), content_type="application/json")
     
 @csrf_protect
@@ -230,28 +333,40 @@ def update_cabinet(request):
 @csrf_protect
 @login_required
 def get_cabinets(request):
-    cbs = Cabinets.objects.all()
-    cb_total = 0
+    page = int(request.REQUEST.get('page', ''))
+    rows = int(request.REQUEST.get('rows', ''))
+    r_from = (page - 1) * rows
+    idc = request.REQUEST.get('idcid', '')
     cb_list = []
-    for cb in cbs:
-        is_full = '有' if cb.available == 0 else '无'
-        c = {"cb-name" : cb.name,
-             'idc-name' : cb.idc.idc_name,
-             'cb-size' : cb.size,
-             'storage-date' : cb.add_date,
-             'end-date' : cb.end_date,
-             'sum-servers' : cb.servers,
-             'is-full' : is_full,
-             'op-name' : cb.admin.username,
-             'cb-id' : cb.id,
-             'idc-id' : cb.idc.id,
-             'user-id' : cb.admin.id,
-             'cb-usable' : cb.available
-             }
-        cb_list.append(c)
-        cb_total += 1
-    raw_json = {'total' : cb_total, "rows" : cb_list}
-    return HttpResponse(json.dumps(raw_json), content_type="application/json")
+    if idc:
+        n = 0
+        cbs = Cabinets.objects.filter(idc = idc).values_list('id', 'name')
+        for cb in cbs:
+            c = {'id' : cb[0], 'name' : cb[1], 'selected' : 'true'} if n == 0 else {'id' : cb[0], 'name' : cb[1]}
+            cb_list.append(c)
+            n += 1
+        return HttpResponse(json.dumps(cb_list), content_type="application/json")
+    else:
+        cbs = Cabinets.objects.all()[r_from:r_from + rows]
+        cb_total = Cabinets.objects.count()
+        for cb in cbs:
+            is_full = '有' if cb.available == 0 else '无'
+            c = {"cb-name" : cb.name,
+                 'idc-name' : cb.idc.idc_name,
+                 'cb-size' : cb.size,
+                 'storage-date' : cb.add_date,
+                 'end-date' : cb.end_date,
+                 'sum-servers' : cb.servers,
+                 'is-full' : is_full,
+                 'op-name' : cb.admin.username,
+                 'cb-id' : cb.id,
+                 'idc-id' : cb.idc.id,
+                 'user-id' : cb.admin.id,
+                 'cb-usable' : cb.available
+                 }
+            cb_list.append(c)
+        raw_json = {'total' : cb_total, "rows" : cb_list}
+        return HttpResponse(json.dumps(raw_json), content_type="application/json")
 
 def get_usable(request):
     usable = request.REQUEST.get('ub', '')

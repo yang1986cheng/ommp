@@ -51,7 +51,8 @@ def check_post_val(*args):
             break
     return x
 
-
+def get_now_date():
+    return datetime.date.today().strftime('%m/%d/%Y')
 
 
 

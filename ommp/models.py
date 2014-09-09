@@ -41,12 +41,18 @@ class IPs(models.Model):
     idc = models.ForeignKey(IDCs)
     is_used = models.IntegerField(max_length = 1)
 
-class Hosts(models.Model):
+class Servers(models.Model):
     name = models.CharField(max_length = 30)
     idc = models.ForeignKey(IDCs)
-    height = models.IntegerField(max_length = 2)
-    is_used = models.IntegerField(max_length = 1)
-    cabinets = models.ForeignKey(Cabinets)
+    cabinets = models.ForeignKey(Cabinets, related_name='cab_name')
+    os = models.CharField(max_length = 30)
+    size = models.CharField(max_length = 10)
+    parts = models.CharField(max_length = 30)
+    add_date = models.CharField(max_length = 10)
+    end_date = models.CharField(max_length = 10)
+    father = models.ForeignKey('self', null = True)
+    used_type = models.IntegerField(max_length = 1)
+    admin = models.ForeignKey(User)
 
 class Relations(models.Model):
     ip = models.ForeignKey(IPs)

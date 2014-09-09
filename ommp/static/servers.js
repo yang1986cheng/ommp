@@ -1,6 +1,18 @@
 $(document).ready(function(){
+
+    $('#svr-add-idc').combobox({
+        onChange:function(newValue, oldValue) {
+            $('#svr-add-cab').combobox({
+                onBeforeLoad:function(param) {
+                param.idcid=newValue
+            },
+            'url' : '/resource/get-cabs/'}
+            )}
+    })
+
     $('#svr-display-table').datagrid({
         title:'服务器列表',
+        url:'/resource/get-servers/',
         fit:true,
         iconCls:'icon-filter',
         fitColumns:true,
@@ -15,70 +27,54 @@ $(document).ready(function(){
         striped:true,
         columns:[[
 //            {field:'svr-id':title:'ID',with 5},
-//            {field:'idc-id', title:'IDC-ID'},
-//            {field:'user-id', title:'User-ID'},
-//            {field:'svr-usable', title:'usable'},
+//            {field:'cab-id', title:'CAB-ID'},
+//            {field:'admin-id', title:'User-ID'},
+//            {field:'svr-used-type', title:'usable'},
             {field:'svr-name', title:'编号', width:40},
             {field:'idc-name', title:'所在机房', width:40},
             {field:'cab-name', title:'所属机柜', width:40},
             {field:'svr-size', title:'规格', width:20},
-            {field:'svr-parts', title:'配置', width:40},
+            {field:'svr-parts', title:'配置', width:60},
+            {field:'svr-os', title:'操作系统', width:40},
             {field:'storage-date', title:'入库日期', width:40},
             {field:'end-date', title:'到期日期', width:40},
             {field:'father-server', title:'父级', width:40},
-            {field:'pro-name', title:'所属项目', width:40},
-            {field:'op-name', title:'负责人', width:40}
+            {field:'svr-usable', title:'类型', width:20},
+            {field:'admin-name', title:'负责人', width:40}
         ]],
         onSelect:function(rowIndex, rowData) {
             $('#btn-update').linkbutton('enable')
             $('#btn-del').linkbutton('enable')
         },
-        onDblClickRow:open_update_window,
+        onDblClickRow:function () {
+            parts_tip()
+            size_tip()
+            father_tip()
+            open_update_window()
+        },
         toolbar:[{
             id:'btn-add',
             text:'添加',
             iconCls:'icon-add',
             handler:function(){
-                $('.parts-tip').tooltip({
-                    position:'right',
-                    content:'<span style="color: #000000">格式如下：<br>8核|8G-DDR3|160G-SSD</span> ',
-                    onShow:function() {
-                        $(this).tooltip('tip').css({
-                            backgroundColor:'#ffe48d',
-                            borderColor:'#666'
-                        })
-                    }
-                })
-                $('.size-tip').tooltip({
-                    position:'right',
-                    content:'<span style="color: #000000">合法内容包括：<br>xU<br>塔式<br>刀柜<br>刀片<br>虚拟机</span> ',
-                    onShow:function() {
-                        $(this).tooltip('tip').css({
-                            backgroundColor:'#ffe48d',
-                            borderColor:'#666'
-                        })
-                    }
-                })
-                $('.father-tip').tooltip({
-                    position:'right',
-                    content:'<span style="color: #000000">该服务器是否构建在其它服务器下，<br>如刀片机的父服务器为某个刀柜，<br>虚拟机的父服务器为某个物理机。<br>有则选选择有</span> ',
-                    onShow:function() {
-                        $(this).tooltip('tip').css({
-                            backgroundColor:'#ffe48d',
-                            borderColor:'#666'
-                        })
-                    }
-                })
+                parts_tip()
+                size_tip()
+                father_tip()
                 $('#svr-add-new').dialog('open'),
                     $('#svr-admin').combobox({'url':'/resource/get-users/'}),
-                    $('#svr-idc').combobox({'url':'/resource/get-idcs/'})
+                    $('#svr-add-idc').combobox({'url':'/resource/get-idcs/'})
             }
         },{
             id:'btn-update',
             text:"更新",
             iconCls:'icon-edit',
             disabled:true,
-            handler:open_update_window
+            handler:function() {
+                parts_tip()
+                size_tip()
+                father_tip()
+                open_update_window()
+            }
         },'-',{
             id:'btn-del',
             text:'删除',
@@ -89,14 +85,14 @@ $(document).ready(function(){
                     if (r){
                         var val = $('#svr-display-table').datagrid('getSelected')
                         if (val) {
-                            var cid=val['svr-id']
-                            $.post('/resource/del-cab/',
-                                {'cid':cid},
+                            var sid=val['svr-id']
+                            $.post('/resource/del-server/',
+                                {'sid':sid},
                                 function(data, status) {
                                     if(status == 'success' && data['status'] == 'success') {
                                         alert("删除成功!")
                                         $('#svr-display-table').datagrid('reload')
-                                    } else {alert("删除失败，请重试!")}
+                                    } else {alert(data['data'])}
                                 })
                         }
                     }
@@ -106,7 +102,7 @@ $(document).ready(function(){
     })
     var p = $('#svr-display-table').datagrid('getPager');
     $(p).pagination({
-        pageSize:30,
+        pageSize:10,
         pageList:[10,30,50,100],
         beforePageText:'第',
         afterPageText:'页 共 {pages} 页',
@@ -115,18 +111,19 @@ $(document).ready(function(){
 
 })
 
-function cb_add_server_commit() {
-    $.post('/resource/add-cab/',
+function add_server_commit() {
+    $.post('/resource/add-server/',
         $('#svr-add-form').serialize(),
         function(data, status) {
-            if (status == 'success' && data['status']) {
+            if (status == 'success' && data['status'] == 'success') {
                 alert("添加成功!")
-                parent.location.reload()
+                $('#svr-add-new').dialog('close')
+                $('#svr-display-table').datagrid('reload')
             } else {alert("添加失败，请重试!")}
         })
 }
 
-function cb_add_server_cancel() {
+function add_server_cancel() {
     $('#svr-add-new').dialog('close')
 }
 
@@ -165,7 +162,14 @@ function check_father_selected() {
     if (!$('#svr-none-father').is(":checked")) {
         $('#svr-add-father').combobox('disable')
     } else {
-        $('#svr-add-father').combobox('enable')
+        var cab = $('#svr-add-cab').combobox('getValue')
+        $('#svr-add-father').combobox({
+            url:'/resource/get-servers/',
+            onBeforeLoad:function(param) {
+                param.cab = cab;
+            },
+            disabled:false
+        })
     }
 }
 
@@ -188,6 +192,51 @@ function check_update_project_selected() {
         $('#svr-update-project').combobox('disable')
     } else {$('#svr-update-project').combobox('enable')}
 }
+
+function parts_tip() {
+    $('.parts-tip').tooltip({
+        position:'right',
+        content:'<span style="color: #000000">格式如下：<br><br>8CPUs|8G-DDR3|160G-SSD</span> ',
+        onShow:function() {
+            $(this).tooltip('tip').css({
+                backgroundColor:'#ffe48d',
+                borderColor:'#666'
+            })
+        }
+    })
+}
+
+function size_tip() {
+    $('.size-tip').tooltip({
+        position:'right',
+        content:'<span style="color: #000000">合法内容包括：<br><br>xU<br>塔式<br>刀柜<br>刀片<br>虚拟机</span> ',
+        onShow:function() {
+            $(this).tooltip('tip').css({
+                backgroundColor:'#ffe48d',
+                borderColor:'#666'
+            })
+        }
+    })
+}
+
+function father_tip() {
+    $('.father-tip').tooltip({
+        position:'right',
+        content:'<span style="color: #000000">该服务器是否构建在其它服务器下，<br><br>如刀片机的父服务器为某个刀柜，<br>虚拟机的父服务器为某个物理机。<br>有则选选择有</span> ',
+        onShow:function() {
+            $(this).tooltip('tip').css({
+                backgroundColor:'#ffe48d',
+                borderColor:'#666'
+            })
+        }
+    })
+}
+
+function get_cab_base_on_idc() {
+    var iid = $('#svr-add-idc').combobox().getValue()
+    alert(iid)
+}
+
 
 
 
