@@ -31,6 +31,7 @@ urlpatterns = patterns('',
                        url(r'resource/get-servers/$', 'ommp.resources.views.get_servers'),
                        url(r'resource/add-server/$', 'ommp.resources.views.add_server'),
                        url(r'resource/del-server/$', 'ommp.resources.views.del_server'),
+                       url(r'resource/update-server/$', 'ommp.resources.views.update_server'),
                        
                        
                        

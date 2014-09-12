@@ -117,8 +117,12 @@
             </div>
             <div class="svr-add-form-d">
                 <label>硬件配置：</label>
-                <input type="text" name="svr-size" class="easyui-validatebox" data-options="required:true">
+                <input type="text" id="svr-update-parts" name="svr-parts" class="easyui-validatebox" data-options="required:true">
                 <a class="parts-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+            </div>
+            <div class="svr-add-form-d">
+                <label>操作系统：</label>
+                <input type="text" id='svr-update-os' class="easyui-validatebox" name='svr-update-os' data-options="valueField:'id', textField:'name', required:true">
             </div>
             <div class="svr-update-form-d">
                 <label>所在机房：</label>
@@ -126,13 +130,11 @@
             </div>
             <div class="svr-add-form-d">
                 <label>所在机柜：</label>
-                <input id='svr-update-cab' class="easyui-combobox" name='svr-add-cab' style="height: 20px" data-options="valueField:'id', textField:'name', required:true">
+                <input id='svr-update-cab' class="easyui-combobox" name='svr-update-cab' style="height: 20px" data-options="valueField:'id', textField:'name', required:true">
             </div>
             <div class="svr-add-form-d">
                 <label>父服务器：</label>
-                <input id='svr-update-father' class="easyui-combobox" name='svr-add-father' style="height: 20px" data-options="valueField:'id', textField:'name', disabled:true">
-                <input id="svr-update-none-father" type="checkbox" name="none-father" value="0" onclick="check_update_father_selected()">有
-                <a class="father-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+                <input id='svr-update-father' class="easyui-combobox" name='svr-update-father' style="height: 20px" data-options="valueField:'id', textField:'name'">
             </div>
             <!--<div class="svr-add-form-d">-->
                 <!--<label>所属项目：</label>-->
@@ -153,8 +155,8 @@
             </div>
         </form>
         <div id='svr-update-form-button'>
-            <a href="javascript:void(0)" onclick="cb_update_commit()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">更新</a>
-            <a href="javascript:void(0)" onclick="cb_update_cancel()" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'">取消</a>
+            <a href="javascript:void(0)" onclick="svr_update_commit()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">更新</a>
+            <a href="javascript:void(0)" onclick="svr_update_cancel()" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'">取消</a>
         </div>
     </div>
 </div>
