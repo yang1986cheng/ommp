@@ -228,6 +228,7 @@ function check_project_selected() {
 
 function check_update_father_selected() {
     if (!$('#svr-update-none-father').is(":checked")) {
+    	$('#svr-update-father').combobox('clear')
         $('#svr-update-father').combobox('disable')
     } else {
         $('#svr-update-father').combobox('enable')

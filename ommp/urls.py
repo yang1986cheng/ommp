@@ -45,6 +45,11 @@ urlpatterns = patterns('',
                        
                        #about ipaddr
                        url(r'resource/ipaddr/$', 'ommp.resources.views.ipaddr'),
+                       url(r'resource/add-ips/$', 'ommp.resources.views.add_ips'),
+                       url(r'resource/get-ips/$', 'ommp.resources.views.get_ips'),
+                       url(r'resource/update-ip/$', 'ommp.resources.views.update_ip'),
+                       url(r'resource/del-ip/$', 'ommp.resources.views.delete_ip'),
+                       
 
     # Examples:
     # url(r'^$', 'hike.views.home', name='home'),

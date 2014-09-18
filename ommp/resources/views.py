@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 import json
 import base
-from ommp.models import IDCs, Cabinets, Servers
+from ommp.models import IDCs, Cabinets, Servers, IPs, Projects
 import datetime
 
 @csrf_protect
@@ -244,6 +244,8 @@ def get_servers(request):
     rows = request.REQUEST.get('rows', '')
     father_id = request.REQUEST.get('fid', '')
     cab = request.REQUEST.get('cab', '')
+    idc = request.REQUEST.get('idc', '')
+    svr_id = request.REQUEST.get('serid','')
 
     cb_list = []
 
@@ -267,6 +269,21 @@ def get_servers(request):
         svrs = Servers.objects.filter(cabinets = cab)
         for svr in svrs:
             c = {'id' : svr.id, 'name' : svr.name, 'selected' : 'true'} if n == 0 else {'id' : svr.id, 'name' : svr.name}
+            cb_list.append(c)
+            n += 1
+        return HttpResponse(json.dumps(cb_list), content_type="application/json")
+    elif idc:
+        if svr_id:
+            svrs = Servers.objects.filter(idc = idc)
+            for svr in svrs:
+                c = {'id' : svr.id, 'name' : svr.name, 'selected' : 'true'} if int(svr_id) == svr.id else {'id' : svr.id, 'name' : svr.name}
+                cb_list.append(c)
+            return HttpResponse(json.dumps(cb_list), content_type="application/json")
+        
+        n = 0
+        svrs = Servers.objects.filter(idc = idc)
+        for svr in svrs:
+            c = {'id' : svr.id, 'name' : svr.name}
             cb_list.append(c)
             n += 1
         return HttpResponse(json.dumps(cb_list), content_type="application/json")
@@ -474,6 +491,177 @@ def get_usable(request):
 def ipaddr(request):
     return render_to_response('ipaddr.html', context_instance=RequestContext(request))
 
+@csrf_protect
+@login_required
+def add_ips(request):
+    if request.method == 'POST':
+        po = request.POST
+        ip_from = po.get('ip-from', '')
+        ip_end = po.get('ip-end', '')
+        add_type = po.get('add-type', '')
+        netmask = po.get('netmask', '')
+        idc = po.get('add-idc', '')
+        ip_type = po.get('ip-type')
+        
+        if not base.check_post_val(ip_from, ip_end, add_type, netmask, idc, ip_type):
+            raise Http404
+        
+        
+        
+        idc = IDCs.objects.get(id = idc)
+
+        if add_type == '0':                                 #add one ip once time
+            ip = IPs(ip = ip_from,
+                      netmask = netmask,
+                      idc = idc,
+                      ip_type = ip_type,
+                      status = '0',
+                      )
+            raw_json = {'status' : 'success'} if ip.save() == None else {'status' : 'failed'}
+            return HttpResponse(json.dumps(raw_json), content_type="application/json")
+            
+        elif add_type == '1':
+            ip_from = ip_from.split('.')
+            ip_end = int(ip_end)
+            status = True
+
+            for i in range(int(ip_from[3]), ip_end + 1):
+                ip = ip_from[0] + '.' + ip_from[1] + '.' + ip_from[2] + '.' + str(i)
+                ips = IPs(ip = ip,
+                          netmask = netmask,
+                          idc = idc,
+                          ip_type = ip_type,
+                          status = 0,
+                          )
+                if ips.save() == None:
+                    pass
+                else:
+                    status = False
+                    break
+            raw_json = {'status' : 'success'} if status else {'status' : 'failed'}
+            return HttpResponse(json.dumps(raw_json), content_type="application/json")
+        
+@csrf_protect
+@login_required
+def get_ips(request):
+    page = request.REQUEST.get('page', '')
+    rows = request.REQUEST.get('rows', '')
+    ip_type = request.REQUEST.get('ip-type', '')
+    ip_type1 = request.REQUEST.get('ip_type', '')
+    idc = request.REQUEST.get('idc','')
+    pri_ip_id = request.REQUEST.get('priid', '')
+    ip_list = []
+    
+    if ip_type1 and idc:
+        ips = IPs.objects.filter(ip_type = ip_type1, idc = idc)
+        for ip in ips:
+            if pri_ip_id:
+                i = {'id' : ip.id,'name' : ip.ip, 'selected' : 'true'} if int(pri_ip_id) == ip.id else {'id' : ip.id,'name' : ip.ip}
+                ip_list.append(i)
+            else:
+                i = {'id' : ip.id,'name' : ip.ip}
+                ip_list.append(i)
+                
+        return HttpResponse(json.dumps(ip_list), content_type="application/json")
+                
+            
+        
+    
+    if page and rows:
+        page = int(page)
+        rows = int(rows)
+        r_from = (page - 1) * rows
+        ips = IPs.objects.filter(ip_type = ip_type)[r_from:r_from + rows]
+        cb_total = IPs.objects.filter(ip_type = ip_type).count()
+        
+        for ip in ips:
+            if ip.status == 0:
+                status = '可用'
+            elif ip.status == 1:
+                status = '不可用'
+            else: status = '已使用'
+            
+            if ip.servers == None:
+                svr_id = ''
+                svr_name = ''
+            else:
+                svr_id = ip.servers.id
+                svr_name = ip.servers.name
+            
+            if ip.project == None:
+                pro_id = ''
+                pro_name = ''
+            else: 
+                pro_id = ip.project.id
+                pro_name = ip.project.name
+                
+            i = {'svr-id' : svr_id,
+                 'idc-id' : ip.idc.id,
+                 'ip-id' : ip.id,
+                 'pro-id' : pro_id,
+                 'ip-name' : ip.ip,
+                 'idc-name' : ip.idc.idc_name,
+                 'pro_name' : pro_name,
+                 'svr-name' : svr_name,
+                 'ip-comment' : ip.comment,
+                 'status' : status,
+                 }
+            
+            ip_list.append(i)
+            
+        raw_json = {'total' : cb_total, "rows" : ip_list}
+        return HttpResponse(json.dumps(raw_json), content_type="application/json")
+    
+@csrf_protect
+@login_required
+def update_ip(request):
+    if request.method == 'POST':
+        po = request.POST
+        
+        comment = po.get('ip-up-comment', '')
+        project = po.get('ip-up-pro-id', '')
+        server = po.get('ip-up-svr-id', '')
+        ip = po.get('up-ip-id', '')
+        status = po.get('status', '')
+        
+        if not ip:
+            raise Http404
+
+        ip = IPs.objects.get(id = ip)
+        
+        if status and (int(status) == 1 or int(status) == 0):
+            ip.status = status
+            ip.project = None
+            ip.servers = None
+            ip.comment = comment
+            raw_json = {'status' : 'success'} if ip.save() == None else {'status' : 'failed'}
+            return HttpResponse(json.dumps(raw_json), content_type="application/json")
+                
+            
+        
+        if project:
+            ip.project = Projects.objects.get(id = project)
+
+        if server:
+            ip.servers = Servers.objects.get(id = server)
+            ip.status = 2
+            
+        ip.comment = comment
+        
+        raw_json = {'status' : 'success'} if ip.save() == None else {'status' : 'failed'}
+        return HttpResponse(json.dumps(raw_json), content_type="application/json")
+
+                    
+@csrf_protect
+@login_required
+def delete_ip(request):
+    if request.method == 'POST':
+        po = request.POST
+        ip = po.get('ipid','')
+        
+        if ip:
+            raw_json = {'status' : 'success'} if IPs.objects.get(id = ip).delete() == None else {'status' : 'failed'}
+            return HttpResponse(json.dumps(raw_json), content_type="application/json")
 
 
 

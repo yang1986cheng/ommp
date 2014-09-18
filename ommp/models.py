@@ -35,11 +35,7 @@ class Projects(models.Model):
     source_dir = models.CharField(max_length = 30)
     target_dir = models.CharField(max_length = 30)
     status = models.IntegerField(max_length = 1, help_text = '0:enable, 1:disable')
-
-class IPs(models.Model):
-    ip = models.IPAddressField(max_length = 15)
-    idc = models.ForeignKey(IDCs)
-    is_used = models.IntegerField(max_length = 1)
+    
 
 class Servers(models.Model):
     name = models.CharField(max_length = 30)
@@ -53,6 +49,17 @@ class Servers(models.Model):
     father = models.ForeignKey('self', null = True)
     used_type = models.IntegerField(max_length = 1)
     admin = models.ForeignKey(User)
+    
+class IPs(models.Model):
+    ip = models.IPAddressField(max_length = 15)
+    netmask = models.IPAddressField(max_length = 15)
+    ip_type = models.IntegerField(max_length = 1)                   #0:private ip, 1:public ip
+    idc = models.ForeignKey(IDCs)
+    project = models.ForeignKey(Projects, null = True)
+    status = models.IntegerField(max_length = 1, null = True)       #0:enable, 1:disable, 2:is_used
+    servers = models.ForeignKey(Servers, null = True)
+    used_for = models.IntegerField(max_length = 1, null = True)      #0:real_ip, 1:VIP, 2:manage_ip
+    comment = models.CharField(max_length = 50)
 
 class Relations(models.Model):
     ip = models.ForeignKey(IPs)
