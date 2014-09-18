@@ -149,8 +149,8 @@ function open_public_table() {
             {field:'ip-comment', title:'备注', width:40}
         ]],
         onSelect:function(rowIndex, rowData) {
-            $('#btn-update').linkbutton('enable')
-            $('#btn-del').linkbutton('enable')
+            $('#btn-update-pub').linkbutton('enable')
+            $('#btn-del-pub').linkbutton('enable')
         },
         onDblClickRow:function () {
             open_update_window('#ip-private-update','#ip-public-table')
@@ -184,7 +184,7 @@ function open_public_table() {
                 $('#ip-add-idc').combobox({url:'/resource/get-idcs/'})
             }
         },{
-            id:'btn-update',
+            id:'btn-update-pub',
             text:"更新",
             iconCls:'icon-edit',
             disabled:true,
@@ -192,14 +192,14 @@ function open_public_table() {
                 open_update_window('#ip-private-update','#ip-public-table')
             }
         },'-',{
-            id:'btn-del',
+            id:'btn-del-pub',
             text:'删除',
             iconCls:'icon-clear',
             disabled:true,
             handler:function(){
                 $.messager.confirm('删除确认', '请确认需要删除该IP信息!<br><br>该操作将不可撤销!', function(r){
                     if (r){
-                        var val = $('#ip-private-table').datagrid('getSelected')
+                        var val = $('#ip-public-table').datagrid('getSelected')
                         if (val) {
                             var cid=val['ip-id']
                             $.post('/resource/del-ip/',
@@ -207,7 +207,7 @@ function open_public_table() {
                                 function(data, status) {
                                     if(status == 'success' && data['status'] == 'success') {
                                         alert("删除成功!")
-                                        $('#ip-private-table').datagrid('reload')
+                                        $('#ip-public-table').datagrid('reload')
                                     } else {alert("删除失败，请重试!")}
                                 })
                         }

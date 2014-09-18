@@ -554,6 +554,8 @@ def get_ips(request):
     
     if ip_type1 and idc:
         ips = IPs.objects.filter(ip_type = ip_type1, idc = idc)
+        if not ips:
+            pass
         for ip in ips:
             if pri_ip_id:
                 i = {'id' : ip.id,'name' : ip.ip, 'selected' : 'true'} if int(pri_ip_id) == ip.id else {'id' : ip.id,'name' : ip.ip}
@@ -572,6 +574,8 @@ def get_ips(request):
         rows = int(rows)
         r_from = (page - 1) * rows
         ips = IPs.objects.filter(ip_type = ip_type)[r_from:r_from + rows]
+        if not ips:
+            pass
         cb_total = IPs.objects.filter(ip_type = ip_type).count()
         
         for ip in ips:
