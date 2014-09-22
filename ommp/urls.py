@@ -49,6 +49,13 @@ urlpatterns = patterns('',
                        url(r'resource/get-ips/$', 'ommp.resources.views.get_ips'),
                        url(r'resource/update-ip/$', 'ommp.resources.views.update_ip'),
                        url(r'resource/del-ip/$', 'ommp.resources.views.delete_ip'),
+                       url(r'resource/add-ip-relation/$', 'ommp.resources.views.add_ip_relation'),
+                       url(r'resource/get-ip-relation/$', 'ommp.resources.views.get_ip_relation'),
+                       url(r'resource/del-ip-relation/$', 'ommp.resources.views.del_ip_relation'),
+                       url(r'resource/update-ip-relation/$', 'ommp.resources.views.update_ip_relation'),
+                       
+                       #about project
+                       url(r'project/list/$', 'ommp.projects.views.listpro'),
                        
 
     # Examples:

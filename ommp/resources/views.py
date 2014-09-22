@@ -1,13 +1,13 @@
 #coding: utf-8
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response, HttpResponseRedirect, RequestContext
+from django.shortcuts import render_to_response, RequestContext
 from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 import json
 import base
-from ommp.models import IDCs, Cabinets, Servers, IPs, Projects
-import datetime
+from ommp.models import IDCs, Cabinets, Servers, IPs, Projects, Relations
+
 
 @csrf_protect
 def add_idc(request):
@@ -547,13 +547,13 @@ def get_ips(request):
     page = request.REQUEST.get('page', '')
     rows = request.REQUEST.get('rows', '')
     ip_type = request.REQUEST.get('ip-type', '')
-    ip_type1 = request.REQUEST.get('ip_type', '')
     idc = request.REQUEST.get('idc','')
     pri_ip_id = request.REQUEST.get('priid', '')
+    status = request.REQUEST.get('status', '')
     ip_list = []
     
-    if ip_type1 and idc:
-        ips = IPs.objects.filter(ip_type = ip_type1, idc = idc)
+    if ip_type and idc:
+        ips = IPs.objects.filter(ip_type = ip_type, idc = idc)
         if not ips:
             pass
         for ip in ips:
@@ -668,8 +668,114 @@ def delete_ip(request):
             return HttpResponse(json.dumps(raw_json), content_type="application/json")
 
 
+#about ip relation
 
+@csrf_protect
+@login_required
+def add_ip_relation(request):
+    po = request.REQUEST
+    pub_ip = po.get('ip-relation-add-pub', '')
+    pub_port = po.get('ip-relation-add-pub-port', '')
+    pri_ip = po.get('ip-relation-add-pri', '')
+    pri_port = po.get('ip-relation-add-pri-port', '')
+    comment = po.get('ip-up-comment', '')
     
+    if not comment:
+        comment = None
+    
+    if not base.check_post_val(pub_ip, pub_port, pri_ip, pri_port):
+        raise 404
+    check_str = pub_ip.strip() + pub_port.strip() + pri_ip.strip() + pri_port.strip()
+    check_code = base.get_check_code(check_str)
+    
+    pub_ip = IPs.objects.get(id = pub_ip)
+    pri_ip = IPs.objects.get(id = pri_ip)
+    
+    check_value = Relations.objects.filter(check_code = check_code).count()
+    if check_value > 0:
+            raw_json = {'status' : 'failed', 'data' : '已有相同映射,请查证再提交'} 
+            return HttpResponse(json.dumps(raw_json), content_type="application/json") 
+    
+    rel = Relations(public_ip = pub_ip,
+                    public_port = pub_port,
+                    private_ip = pri_ip,
+                    private_port = pri_port,
+                    relation_type = 0,
+                    comment = comment,
+                    check_code = check_code
+                    )
+    raw_json = {'status' : 'success'} if rel.save() == None else {'status' : 'failed'}
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
+
+@csrf_protect
+@login_required
+def get_ip_relation(request):
+    page = request.REQUEST.get('page', '')
+    rows = request.REQUEST.get('rows', '')
+    
+    if page and rows:
+        r_from, r_end = base.sum_page_from_to_end(page, rows)
+        rel_total = Relations.objects.filter(relation_type = '0').count()
+        rels = Relations.objects.filter(relation_type = '0')[r_from:r_end]
+
+        rel_list = []
+        for rel in rels:
+            s = {'relation-id' : rel.id,
+                 'pub-ip-id' : rel.public_ip.id,
+                 'pri-ip-id' : rel.private_ip.id,
+                 'pub-name' : rel.public_ip.ip,
+                 'pub-port' : rel.public_port,
+                 'pri-name' : rel.private_ip.ip,
+                 'pri-port' : rel.private_port,
+                 'ip-comment' : rel.comment,
+                 'idc-id' : rel.public_ip.idc.id
+                 }
+            rel_list.append(s)
+
+        raw_json = {'total' : rel_total, 'rows' : rel_list}
+        return HttpResponse(json.dumps(raw_json), content_type="application/json")
+
+@csrf_protect
+@login_required
+def del_ip_relation(request):
+    rel_id = request.REQUEST.get('rel-id')
+    if rel_id:
+        raw_json = {'status' : 'success'} if Relations.objects.get(id = rel_id).delete() == None else {'status' : 'failed'}
+        return HttpResponse(json.dumps(raw_json), content_type="application/json")
+    
+@csrf_protect
+@login_required
+def update_ip_relation(request):
+    po = request.REQUEST
+    pub_ip = po.get('ip-pub-id', '')
+    pub_port = po.get('ip-relation-update-pub-port', '')
+    pri_ip = po.get('ip-pri-id', '')
+    pri_port = po.get('ip-relation-update-pri-port', '')
+    comment = po.get('ip-up-comment', '')
+    rel_id = po.get('ip-relation-id', '')
+    
+    if not comment:
+        comment = None
+    
+    if not base.check_post_val(pub_ip, pub_port, pri_ip, pri_port, rel_id):
+        raise Http404
+    check_str = pub_ip.strip() + pub_port.strip() + pri_ip.strip() + pri_port.strip()
+    check_code = base.get_check_code(check_str)
+
+    pub_ip = IPs.objects.get(id = pub_ip)
+    pri_ip = IPs.objects.get(id = pri_ip)
+    rel = Relations.objects.get(id = rel_id)
+
+    rel.public_ip = pub_ip
+    rel.public_port = pub_port
+    rel.private_ip = pri_ip
+    rel.private_port = pri_port
+    rel.relation_type = 0
+    rel.comment = comment
+    rel.check_code = check_code
+    raw_json = {'status' : 'success'} if rel.save() == None else {'status' : 'failed'}
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
+
     
     
     

@@ -1,5 +1,6 @@
 #coding: utf-8
 import json
+import base64, hashlib
 import datetime
 
 def get_post_val(request):
@@ -55,9 +56,18 @@ def get_now_date():
     return datetime.date.today().strftime('%m/%d/%Y')
 
 
+def sum_page_from_to_end(page, rows):
+    page = int(page)
+    rows = int(rows)
+    r_from = (page - 1) * rows
+    r_end = r_from + rows
+    
+    return [r_from, r_end]
 
-
-
+def get_check_code(instr):
+    hash = hashlib.md5()
+    hash.update(instr.strip())
+    return base64.encodestring(hash.digest())
 
 
 

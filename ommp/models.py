@@ -62,8 +62,14 @@ class IPs(models.Model):
     comment = models.CharField(max_length = 50)
 
 class Relations(models.Model):
-    ip = models.ForeignKey(IPs)
-    project = models.ForeignKey(Projects)
+    public_ip = models.ForeignKey(IPs, null = True, related_name='public_ip')
+    public_port = models.IntegerField(max_length = 5, null = True)
+    private_ip = models.ForeignKey(IPs, null = True, related_name='puivate_ip')
+    private_port = models.IntegerField(max_length = 5, null = True)
+    project = models.ForeignKey(Projects, null = True)
+    relation_type = models.IntegerField(max_length = 1)             #0:ip relation, 1:ip-project relation
+    comment = models.CharField(max_length = 50, null = True)
+    check_code = models.CharField(max_length = 32, null = True)
 
 class DeployLogs(models.Model):
     '''
