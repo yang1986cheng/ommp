@@ -59,6 +59,7 @@ def get_now_date():
 def sum_page_from_to_end(page, rows):
     page = int(page)
     rows = int(rows)
+    page = 1 if page == 0 else page
     r_from = (page - 1) * rows
     r_end = r_from + rows
     

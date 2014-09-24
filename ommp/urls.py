@@ -56,6 +56,13 @@ urlpatterns = patterns('',
                        
                        #about project
                        url(r'project/list/$', 'ommp.projects.views.listpro'),
+                       url(r'project/add-project/$', 'ommp.projects.views.add_project'),
+                       url(r'project/list-projects/$', 'ommp.projects.views.list_projects'),
+                       url(r'project/update-project/$', 'ommp.projects.views.update_project'),
+                       url(r'project/del-project/$', 'ommp.projects.views.delete_project'),
+                       url(r'project/add-pro-ip-relation/$', 'ommp.projects.views.add_pro_ip_relation'),
+                       url(r'project/list-pro-ip-relations/$', 'ommp.projects.views.list_pro_ip_relations'),
+                       url(r'project/del-pro-ip-relation/$', 'ommp.projects.views.del_pro_ip_relation'),
                        
 
     # Examples:

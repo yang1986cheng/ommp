@@ -1,9 +1,6 @@
-import base64
-import hashlib
+a = [0, 2, 3]
+b = [1, 2, 4]
 
-def get_check_code(instr):
-    hash = hashlib.md5()
-    hash.update(instr.strip())
-    return base64.encodestring(hash.digest())
-
-print get_check_code('1231')
+for x in a:
+    if x not in b:
+        print x

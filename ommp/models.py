@@ -30,11 +30,14 @@ class Projects(models.Model):
     '''
     projects informations
     '''
-    name = models.CharField(max_length = 30)
-    repo = models.CharField(max_length = 30)
-    source_dir = models.CharField(max_length = 30)
-    target_dir = models.CharField(max_length = 30)
-    status = models.IntegerField(max_length = 1, help_text = '0:enable, 1:disable')
+    name = models.CharField(max_length = 20)
+    desc = models.CharField(max_length = 30)
+    admin = models.CharField(max_length = 20)
+    add_date = models.CharField(max_length = 10)
+    repo = models.CharField(max_length = 100)
+    language = models.CharField(max_length = 20)
+    environment = models.CharField(max_length = 100)
+    comment = models.CharField(max_length = 100, null = True)
     
 
 class Servers(models.Model):
@@ -66,6 +69,7 @@ class Relations(models.Model):
     public_port = models.IntegerField(max_length = 5, null = True)
     private_ip = models.ForeignKey(IPs, null = True, related_name='puivate_ip')
     private_port = models.IntegerField(max_length = 5, null = True)
+    pro_ip = models.ForeignKey(IPs, null = True, related_name = 'pro_ip')
     project = models.ForeignKey(Projects, null = True)
     relation_type = models.IntegerField(max_length = 1)             #0:ip relation, 1:ip-project relation
     comment = models.CharField(max_length = 50, null = True)

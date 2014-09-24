@@ -291,9 +291,9 @@ def get_servers(request):
     if page and rows:
         page = int(page)
         rows = int(rows)
-        r_from = (page - 1) * rows
+        r_from, r_end = base.sum_page_from_to_end(page, rows)
         
-        svrs = Servers.objects.all()[r_from:r_from + rows]
+        svrs = Servers.objects.all()[r_from:r_end]
         cb_total = Servers.objects.count()
         for svr in svrs:
             svr_father = "无" if svr.father == None else svr.father.name
@@ -446,8 +446,8 @@ def get_cabinets(request):
     if page and rows:
         page = int(page)
         rows = int(rows)
-        r_from = (page - 1) * rows
-        cbs = Cabinets.objects.all()[r_from:r_from + rows]
+        r_from, r_end = base.sum_page_from_to_end(page, rows)
+        cbs = Cabinets.objects.all()[r_from:r_end]
         cb_total = Cabinets.objects.count()
         for cb in cbs:
             is_full = '有' if cb.available == 0 else '无'
@@ -553,18 +553,32 @@ def get_ips(request):
     ip_list = []
     
     if ip_type and idc:
-        ips = IPs.objects.filter(ip_type = ip_type, idc = idc)
-        if not ips:
-            pass
-        for ip in ips:
-            if pri_ip_id:
-                i = {'id' : ip.id,'name' : ip.ip, 'selected' : 'true'} if int(pri_ip_id) == ip.id else {'id' : ip.id,'name' : ip.ip}
-                ip_list.append(i)
-            else:
-                i = {'id' : ip.id,'name' : ip.ip}
-                ip_list.append(i)
-                
-        return HttpResponse(json.dumps(ip_list), content_type="application/json")
+        if status:
+            ips = IPs.objects.filter(ip_type = ip_type, idc = idc, status = status)
+            if not ips:
+                pass
+            for ip in ips:
+                if pri_ip_id:
+                    i = {'id' : ip.id,'name' : ip.ip, 'selected' : 'true'} if int(pri_ip_id) == ip.id else {'id' : ip.id,'name' : ip.ip}
+                    ip_list.append(i)
+                else:
+                    i = {'id' : ip.id,'name' : ip.ip}
+                    ip_list.append(i)
+                    
+            return HttpResponse(json.dumps(ip_list), content_type="application/json")
+        else:
+            ips = IPs.objects.filter(ip_type = ip_type, idc = idc)
+            if not ips:
+                pass
+            for ip in ips:
+                if pri_ip_id:
+                    i = {'id' : ip.id,'name' : ip.ip, 'selected' : 'true'} if int(pri_ip_id) == ip.id else {'id' : ip.id,'name' : ip.ip}
+                    ip_list.append(i)
+                else:
+                    i = {'id' : ip.id,'name' : ip.ip}
+                    ip_list.append(i)
+                    
+            return HttpResponse(json.dumps(ip_list), content_type="application/json")
                 
             
         
@@ -572,8 +586,8 @@ def get_ips(request):
     if page and rows:
         page = int(page)
         rows = int(rows)
-        r_from = (page - 1) * rows
-        ips = IPs.objects.filter(ip_type = ip_type)[r_from:r_from + rows]
+        r_from, r_end = base.sum_page_from_to_end(page, rows)
+        ips = IPs.objects.filter(ip_type = ip_type)[r_from:r_end]
         if not ips:
             pass
         cb_total = IPs.objects.filter(ip_type = ip_type).count()
