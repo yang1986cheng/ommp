@@ -47,6 +47,8 @@ class Servers(models.Model):
     os = models.CharField(max_length = 30)
     size = models.CharField(max_length = 10)
     parts = models.CharField(max_length = 30)
+    hostname = models.CharField(max_length = 120)
+    login_name = models.CharField(max_length = 120)
     add_date = models.CharField(max_length = 10)
     end_date = models.CharField(max_length = 10)
     father = models.ForeignKey('self', null = True)
@@ -74,6 +76,37 @@ class Relations(models.Model):
     relation_type = models.IntegerField(max_length = 1)             #0:ip relation, 1:ip-project relation
     comment = models.CharField(max_length = 50, null = True)
     check_code = models.CharField(max_length = 32, null = True)
+    
+class Templates(models.Model):
+    name = models.CharField(max_length = 50)
+    project = models.ForeignKey(Projects)
+    target_type = models.IntegerField(max_length = 1)                   #1: as project, 2: as hosts
+    hosts = models.CharField(max_length = 9999, null = True)
+    threads = models.IntegerField(max_length = 2)
+    is_backup = models.IntegerField(max_length = 1)                     #0: false    1:true
+    backup_dir = models.CharField(max_length = 120, null = True)
+    login_user = models.CharField(max_length = 30, null = True)
+    addition_args = models.CharField(max_length = 120)
+    source_dir = models.CharField(max_length = 150)
+    temporary_dir = models.CharField(max_length = 150, null = True)
+    target_dir = models.CharField(max_length = 150)
+    exclude_files = models.TextField(null = True)
+    after_operations = models.CharField(max_length = 2000, null = True)
+    
+class Task_logs(models.Model):
+    task_log_id = models.CharField(db_index = True, max_length = 20)
+    template = models.ForeignKey(Templates)
+    config = models.TextField()
+    add_time = models.DateTimeField()
+    start_time = models.DateTimeField(null = True)
+    end_time = models.DateTimeField(null = True)
+    oper_user = models.ForeignKey(User)
+    status_code = models.IntegerField(max_length = 1, db_index = True)                       #0:pending, 1:doing, 2:pause, 3:terminated, 4:done, 
+    status = models.TextField(null = True)
+    back_file = models.CharField(max_length = 120, null = True)
+    back_file_code = models.CharField(max_length = 32, null = True)
+    
+#    pro_status = models.
 
 class DeployLogs(models.Model):
     '''

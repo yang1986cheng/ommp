@@ -5,7 +5,9 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 
+CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -128,6 +130,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ommp',
+    'djcelery',
+    'djkombu',
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

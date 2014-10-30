@@ -1,5 +1,4 @@
 * {
-    margin: 0;
     font:9pt/9pt "Microsoft YaHei";
 }
 
@@ -53,13 +52,6 @@ body {
 .add-idc {
     width: 600px;
     height: 400px;
-    /*position: absolute;*/
-    /*top: 50%;*/
-    /*left: 50%;*/
-    /*margin: -200px 0 0 -300px;*/
-    /*z-index: 3;*/
-    /*display: none;*/
-    /*background-color: #1a9790;*/
 }
 
 .mask {

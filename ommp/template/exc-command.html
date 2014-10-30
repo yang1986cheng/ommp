@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="/static/easyui/themes/icon.css">
+    <link rel="stylesheet" href="/static/exc-command.css"/>
+    <script type="text/javascript" src="/static/jquery-2-1-1.js"></script>
+    <script type="text/javascript" src="/static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="/static/django_post.js"></script>
+    <script type="text/javascript" src="/static/exc-command.js"></script>
+    <title></title>
+</head>
+<body>
+<div class="easyui-dialog" style="height: 650px;width: 100%;margin-top: 0px" data-options="title:'指令执行控制台',iconCls:'icon-filter',closable:false,shadow:true">
+    <form id="exec-command-form">
+    <div class="exec-command">
+        <div class="exec-param">
+            <label>执行方式：</label>
+            <select id="exc-type"></select>
+            <div id="sp">
+                <div style="color:#129992;background:#fafafa;padding:5px;">选择执行类型</div>
+                <input type="radio" name="exc-type" value="1"><span>指定项目执行</span><br/>
+                <input type="radio" name="exc-type" value="2"><span>指定服务器</span><br/>
+                <!--<input type="radio" name="exc-type" value="3"><span>指定系统类型</span><br/>-->
+            </div>
+        </div>
+        <div id="exec-as-project" class="exec-param" style="display: none">
+            <label>&nbsp&nbsp选择项目：</label>
+            <input id="exec-project-list" style="width: 150px" class="easyui-combobox" name="exec-project" data-options="valueField:'id', textField:'name', required:true">
+        </div>
+        <div id="exec-as-hosts" class="exec-param" style="display: none">
+            <label>&nbsp&nbsp选择机房：</label>
+            <input id="exec-idcs-list" style="width: 150px" class="easyui-combobox" name="exec-idc" data-options="valueField:'id', textField:'name', required:true">
+            <label>&nbsp&nbsp选择服务器：</label>
+            <input id="exec-hosts-list" style="width: 150px" class="easyui-combobox" name="exec-server" data-options="valueField:'id', textField:'name', required:true, multiple:true">
+        </div>
+    </div>
+    <div style="display: block;background-color: #99cdff">
+        <label>&nbsp&nbsp执行指令：</label>
+        <input type="text" style="width: 80%" class="easyui-validatebox" id="exc-command-input" name="exc-command" data-options="required:true">&nbsp&nbsp
+        <a href="javascript:void(0)" onclick="do_exec_command()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">执行</a>&nbsp&nbsp
+        <a href="javascript:void(0)" onclick="add_server_cancel()" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'">清除</a>
+    </div>
+    </form>
+    <div class="display-result">
+        <div id="display-result"></div>
+    </div>
+</div>
+</body>
+</html>

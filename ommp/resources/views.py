@@ -166,10 +166,12 @@ def add_server(request):
     used_type = po.get('svr-add-usable', '')
     admin = po.get('svr-add-admin', '')
     os = po.get('svr-add-os', '')
+    hostname = po.get('svr-add-hostname', '')
+    username = po.get('svr-add-username', '')
     
     father = Servers.objects.get(id = father) if father else None
         
-    if not base.check_post_val(name, idc, cabinets, size, parts, end_date, used_type, admin, os):
+    if not base.check_post_val(name, idc, cabinets, size, parts, end_date, used_type, admin, os, hostname, username):
         raise Http404
     
     idc = IDCs.objects.get(id = idc)
@@ -187,6 +189,8 @@ def add_server(request):
                   used_type = used_type,
                   admin = admin,
                   os = os,
+                  hostname = hostname,
+                  login_name = username,
                   )
     raw_json = {'status' : 'success'} if svr.save() == None else {'status' : 'failed'}
     return HttpResponse(json.dumps(raw_json), content_type="application/json")
@@ -210,10 +214,12 @@ def update_server(request):
     used_type = po.get('svr-update-usable', '')
     admin = po.get('svr-update-admin', '')
     os = po.get('svr-update-os', '')
+    hostname = po.get('svr-update-hostname', '')
+    username = po.get('svr-update-username', '')
     
     father = Servers.objects.get(id = father) if father else None
         
-    if not base.check_post_val(svr_id, name, idc, cabinets, size, parts, end_date, used_type, admin, os):
+    if not base.check_post_val(svr_id, name, idc, cabinets, size, parts, end_date, used_type, admin, os, hostname, username):
         raise Http404
     
     idc = IDCs.objects.get(id = idc)
@@ -232,6 +238,8 @@ def update_server(request):
     svr.used_type = used_type
     svr.admin = admin
     svr.os = os
+    svr.hostname = hostname
+    svr.login_name = username
     
     raw_json = {'status' : 'success'} if svr.save() == None else {'status' : 'failed'}
     return HttpResponse(json.dumps(raw_json), content_type="application/json")
@@ -318,12 +326,14 @@ def get_servers(request):
                  'svr-size' : svr.size,
                  'svr-parts' : svr.parts,
                  'svr-os' : svr.os,
+                 'svr-hostname' : svr.hostname,
                  'storage-date' : svr.add_date,
                  'end-date' : svr.end_date,
                  'svr-father' : svr_father,
                  'svr-usable' : used_type,
                  'admin-name' : svr.admin.username,
                  'idc-id' : svr.idc.id,
+                 'svr-username' : svr.login_name,
                  }
             cb_list.append(r)
         raw_json = {'total' : cb_total, "rows" : cb_list}
@@ -579,6 +589,18 @@ def get_ips(request):
                     ip_list.append(i)
                     
             return HttpResponse(json.dumps(ip_list), content_type="application/json")
+    if idc:
+        ips = IPs.objects.filter(idc = idc, status = 2)
+        x = 0
+        if not ips:
+            pass
+        for ip in ips:
+            i = {'id' : ip.id,'name' : ip.ip, 'selected' : 'true'} if x == 0 else {'id' : ip.id,'name' : ip.ip}
+            x += 1
+            ip_list.append(i)
+            
+        return HttpResponse(json.dumps(ip_list), content_type="application/json")
+        
                 
             
         

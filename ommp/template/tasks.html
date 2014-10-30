@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="/static/easyui/themes/icon.css">
+    <link rel="stylesheet" href="/static/template.css"/>
+    <script type="text/javascript" src="/static/jquery-2-1-1.js"></script>
+    <script type="text/javascript" src="/static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="/static/django_post.js"></script>
+    <script type="text/javascript" src="/static/template.js"></script>
+    <title></title>
+</head>
+<body>
+<div id="template-main" style="height: 650px"></div>
+<div id="template-add" class="easyui-dialog" style="width: 40%;height: 650px" data-options="title:'添加项目发布模板',iconCls:'icon-add',modal:true,buttons:'#template-add-btn',closed:true">
+    <form id="template-add-form">
+        <div class="template-add-form-item">
+            <label>模板名称：</label>
+            <input type="text" name="template-name" class="easyui-validatebox" data-options="required:'true'">
+        </div>
+        <div class="template-add-form-item">
+            <label>项&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp目：</label>
+            <input type="text" id="target-project" name="target-project" class="easyui-combobox" data-options="required:'true',valueField:'id', textField:'name'">
+        </div>
+        <div class="template-add-form-item">
+            <label>指定服务器：</label>
+            <input type="checkbox" id="task-as-host" name="task-as-host" value="0" onclick="is_deploy_as_hosts('#task-as-host', '#task-idc', '#task-host')">
+        <span>（如不指定服务器，将对所选项目下所有服务器进行发布)</span>
+        </div>
+        <div class="template-add-form-item">
+            <label>服务器列表：</label>
+            <input type="text" id="task-idc" disabled="disabled" name="task-idc" class="easyui-combobox" data-options="required:'true',valueField:'id', textField:'name',data:[{id:'0',name:'选择机房',selected:'true'}]">
+            <input type="text" id="task-host" disabled="disabled" name="task-host" class="easyui-combobox" data-options="required:'true',multiple:'true',valueField:'id', textField:'name'">
+        </div>
+        <div class="template-add-form-item">
+            <label>线&nbsp程&nbsp数&nbsp：</label>
+            <input type="text" name="thread-count" style="width: 50px" class="easyui-numberbox" min="1" max="10" data-options="required:'true'">
+        </div>
+        <div class="template-add-form-item">
+            <label>是否保留备份：</label>
+            <input type="checkbox" id="task-save-backup" name="is-save-backup" value="1" onclick="is_backup('#task-save-backup', '#backup-dir')">
+        </div>
+        <div class="template-add-form-item">
+            <label>备份目录：</label>
+            <input id="backup-dir" disabled='disabled' type="text" name="backup-dir" style="width: 300px" class="easyui-validatebox">
+            <a class="backup-dir-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>指定登录用户：</label>
+            <input type="text" name="login-name" style="width: 100px" class="easyui-validatebox">
+            <a class="login-user-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>额外同步参数：</label>
+            <input type="text" name="add-args" style="width: 300px" class="easyui-validatebox">
+            <a class="add-args-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>源码目录：</label>
+            <input type="text" name="source-dir" style="width: 300px" class="easyui-validatebox" data-options="required:'true'">
+            <a class="source-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>中转目录：</label>
+            <input type="text" name="temporary-dir" style="width: 300px" class="easyui-validatebox">
+            <a class="temporary-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>目标目录：</label>
+            <input type="text" name="target-dir" style="width: 300px" class="easyui-validatebox" data-options="required:'true'">
+            <a class="target-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>内容排除：</label>
+            <textarea style="width:80%;height: 80px;resize: none" name="exclude-files"></textarea>
+            <a class="exclude-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <!--<div class="template-add-form-item">-->
+            <!--<label>发布前操作：</label>-->
+            <!--<textarea style="width:80%;height: 80px;resize: none" name="before-operation"></textarea>-->
+        <!--</div>-->
+        <!--<div class="template-add-form-item">-->
+            <!--<label>发&nbsp布&nbsp操&nbsp作：</label>-->
+            <!--<textarea style="width:80%;height: 80px;resize: none" class="easyui-validatebox" data-options="required:'true'" name="pro-operation"></textarea>-->
+        <!--</div>-->
+        <div class="template-add-form-item">
+            <label>发布后操作：</label>
+            <textarea style="width:80%;height: 80px;resize: none" name="after-operation"></textarea>
+            <a class="after-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+    </form>
+</div>
+<div id="template-edit" class="easyui-dialog" style="width: 40%;height: 630px" data-options="title:'编辑发布任务',iconCls:'icon-add',modal:true,buttons:'#template-edit-btn', closed:true">
+    <form id="template-edit-form">
+        <input type="hidden" id="task-id" name="task-id">
+        <div class="template-add-form-item">
+            <label>模板名称：</label>
+            <input type="text" name="template-name" disabled="disabled" id="template-name-edit" class="easyui-validatebox" data-options="required:'true'">
+        </div>
+        <div class="template-add-form-item">
+            <label>目标项目：</label>
+            <input type="hidden" id="target-project-id" name="target-project-id">
+            <input type="text" id="target-project-edit" name="target-project" disabled="disabled">
+        </div>
+        <div class="template-add-form-item" id="div1">
+            <label>发布类型：</label>
+            <!--<input type="checkbox" id="task-up-as-host" name="task-as-host" value="0" onclick="is_deploy_as_hosts('#task-up-as-host','#task-up-idc','#task-up-host')">-->
+            <select id="deploy-type" name="deploy-type" onchange="change_deploy_type('#deploy-type', '#task-up-idc','#task-up-host')">
+                <option value="1">按项目发布</option>
+                <option value="2">指定服务器</option>
+            </select>
+        </div>
+        <div class="template-add-form-item" id="div2">
+            <label>服务器列表：</label>
+            <input type="text" id="task-up-idc" disabled="disabled" name="task-idc" class="easyui-combobox" data-options="required:'true',valueField:'id', textField:'name',data:[{id:'0',name:'选择机房',selected:'true'}]">
+            <input type="text" id="task-up-host" disabled="disabled" name="task-host" class="easyui-combobox" data-options="required:'true',multiple:'true',valueField:'id', textField:'name'">
+        </div>
+        <div class="template-add-form-item">
+            <label>线&nbsp程&nbsp数&nbsp：</label>
+            <input type="text" id="thread-count-edit" name="thread-count" style="width: 50px" class="easyui-numberbox" data-options="required:'true'">
+        </div>
+        <div class="template-add-form-item">
+            <label>是否保留备份：</label>
+            <input type="checkbox" id="is-save-backup" name="is-save-backup" value="1" onclick="is_backup('#is-save-backup', '#backup-dir-edit')">
+        </div>
+        <div class="template-add-form-item">
+            <label>备份目录：</label>
+            <input id="backup-dir-edit" type="text" name="backup-dir" style="width: 300px" class="easyui-validatebox">
+            <a class="backup-dir-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>指定登录用户：</label>
+            <input id="login-name" type="text" name="login-name" style="width: 100px" class="easyui-validatebox">
+            <a class="login-user-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>额外同步参数：</label>
+            <input id="add-args" type="text" name="add-args" style="width: 300px" class="easyui-validatebox">
+            <a class="add-args-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>源码目录：</label>
+            <input id="source-dir" type="text" name="source-dir" style="width: 300px" class="easyui-validatebox" data-options="required:'true'">
+            <a class="source-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>中转目录：</label>
+            <input id="temporary-dir" type="text" name="temporary-dir" style="width: 300px" class="easyui-validatebox">
+            <a class="temporary-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>目标目录：</label>
+            <input id="target-dir" type="text" name="target-dir" style="width: 300px" class="easyui-validatebox" data-options="required:'true'">
+            <a class="target-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>内容排除：</label>
+            <textarea style="width:80%;height: 80px;resize: none" id="exclude-files-edit" name="exclude-files"></textarea>
+            <a class="exclude-tip" href="javascript:void(0)"><img src="/static/easyui/themes/icons/help.png"></a>
+        </div>
+        <div class="template-add-form-item">
+            <label>发布后操作：</label>
+            <textarea style="width:80%;height: 80px;resize: none" name="after-operation" id="after-operation-edit"></textarea>
+        </div>
+    </form>
+</div>
+<div id="template-add-btn">
+    <a href="javascript:void(0)" onclick="commit_deploy_item()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">提交</a>
+    <a href="javascript:void(0)" onclick="do_cancel('#template-add')" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'">取消</a>
+</div>
+<div id="template-edit-btn">
+    <a href="javascript:void(0)" id="btn-1" onclick="add_task_to_list()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">生成任务</a>
+    <!--<a href="javascript:void(0)" id="btn-2" onclick="save_add_task_to_list()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存并生成</a>-->
+    <a href="javascript:void(0)" id="btn-3" onclick="update_commit(0)" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">更新</a>
+    <a href="javascript:void(0)" id="btn-4" onclick="do_cancel('#template-edit')" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'">取消</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+.exec-command {
+    width: 100%;
+    height: 32px;
+    background-color: #99cdff;
+}
+
+.display-result {
+    width: 100%;
+    height: 555px;
+    /*background-color: #000000;*/
+    /*color: #ffffff;*/
+}
+
+.exec-param {
+    float: left;
+    margin: 10px 0 0 10px;
+}

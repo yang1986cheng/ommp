@@ -10,9 +10,7 @@ urlpatterns = patterns('',
                        url(r'^$', 'ommp.views.index'),
                        url(r'^management/side/$', 'ommp.views.side'),
                        url(r'^management/welcome/$', 'ommp.views.welcome'),
-                       url(r'^management/deploy-php/$', 'ommp.views.deploy'),
                        url(r'^management/$', 'ommp.views.deploy_index'),
-                       url(r'^functions/logs/$', 'ommp.views.view_logs'),
                        
                        #about idcs
                        url(r'^resource/idc/$', 'ommp.resources.views.list_idc'),
@@ -63,6 +61,29 @@ urlpatterns = patterns('',
                        url(r'project/add-pro-ip-relation/$', 'ommp.projects.views.add_pro_ip_relation'),
                        url(r'project/list-pro-ip-relations/$', 'ommp.projects.views.list_pro_ip_relations'),
                        url(r'project/del-pro-ip-relation/$', 'ommp.projects.views.del_pro_ip_relation'),
+                       
+                       #about salt
+                       url(r'functions/exc-command/$', 'ommp.functions.views.exc_command'),
+                       url(r'functions/exc-command-handler/$', 'ommp.functions.views.handler_command'),
+                       
+                       #about task
+                       url(r'tasks/tasks/$', 'ommp.task.views.tasks'),
+                       url(r'tasks/add-task/$', 'ommp.task.views.add_task'),
+                       url(r'tasks/list-tasks/$', 'ommp.task.views.list_templates'),
+                       url(r'tasks/add-tasks-to-list/$', 'ommp.task.views.add_task_to_list'),
+                       url(r'tasks/update-task/$', 'ommp.task.views.update_task'),
+                       url(r'tasks/delete-task/$', 'ommp.task.views.delete_task'),
+                       url(r'tasks/in-process/$', 'ommp.task.views.in_process'),
+                       url(r'tasks/task-in-process/$', 'ommp.task.views.task_in_process'),
+                       
+                       #about task controller
+                       url(r'tasks/start-process/$', 'ommp.task.views.start_process'),
+                       url(r'tasks/pause-process/$', 'ommp.task.views.pause_process'),
+                       url(r'tasks/restart-process/$', 'ommp.task.views.restart_process'),
+                       url(r'tasks/continue-process/$', 'ommp.task.views.continue_process'),
+                       url(r'tasks/end-process/$', 'ommp.task.views.end_process'),
+                       url(r'tasks/stop-process/$', 'ommp.task.views.stop_process'),
+                       
                        
 
     # Examples:

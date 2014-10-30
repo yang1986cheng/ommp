@@ -78,14 +78,22 @@ def update_project(request):
 def list_projects(request):
     page = request.REQUEST.get('page', '')
     rows = request.REQUEST.get('rows', '')
+    list_type = request.REQUEST.get('list_type', '')
+    pro_list = []
+    if list_type:
+        pros = Projects.objects.all().values_list('id', 'name')
+        i = 0
+        for pro in pros:
+            x = {'id':pro[0], 'name':pro[1], 'selected' : 'true'} if i == 0 else {'id':pro[0], 'name':pro[1]}
+            pro_list.append(x)
+            i += 1
+        
+        return HttpResponse(json.dumps(pro_list), content_type="application/json")
     
     if page and rows:
         r_from, r_end = base.sum_page_from_to_end(page, rows)
         total = Projects.objects.all().count()
         pros = Projects.objects.all()[r_from:r_end]
-    
-    
-    pro_list = []
     
     for pro in pros:
         r = {'pro-id' : pro.id,

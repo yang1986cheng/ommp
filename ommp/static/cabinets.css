@@ -1,5 +1,4 @@
 * {
-    margin: 0;
     font:9pt/9pt "Microsoft YaHei";
 }
 
@@ -9,12 +8,7 @@
 }
 
 .cb-main-div {
-    position:absolute;
     height: 650px;
-    top:50%;
-    left: 50%;
-    margin-top: -325px;
-    margin-left: -400px;
 }
 
 .cb-display-div {

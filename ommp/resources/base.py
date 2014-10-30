@@ -1,7 +1,10 @@
 #coding: utf-8
+#from __future__ import absolute_import
 import json
 import base64, hashlib
 import datetime
+import random
+import subprocess
 
 def get_post_val(request):
     val = {'address' : request.get('address', ''),
@@ -21,6 +24,9 @@ def get_post_val(request):
 
 def get_datetime():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+def get_task_id():
+    return datetime.datetime.now().strftime('%Y%m%d%H%M%S') + str(random.randrange(0,9999)).zfill(5)
 
 def dump_json(code):
     if code == 0:
@@ -70,8 +76,11 @@ def get_check_code(instr):
     hash.update(instr.strip())
     return base64.encodestring(hash.digest())
 
-
-
+def local(command):
+    pipe = subprocess.PIPE
+    p = subprocess.Popen('%s' % (command), stdout = pipe, stderr = pipe, shell = True)
+    out, err = p.communicate()
+    return out, err
 
 
 

@@ -1,0 +1,12 @@
+* {
+    font:9pt/9pt "Microsoft YaHei";
+}
+
+a {
+    text-decoration: none;
+    font:9pt/9pt "Microsoft YaHei";
+}
+
+.template-add-form-item {
+    margin: 10px 0 0 10px;
+}
