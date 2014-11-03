@@ -42,7 +42,15 @@ $(document).ready(function(){
                     }
                 }
             },
-            {field:'task-detail', title:'任务详情', width:40},
+            {
+                field:'task-detail',
+                title:'任务详情',
+                width:20,
+                align:'center',
+                formatter:function(value, row, index) {
+                    return "<a href='javascript:void(0)' onclick='check_detail(" + index + ", \"yes\")'>点击查看</a>"
+                }
+            },
             {
                 field:'operation',
                 title:'操作', width:20,
@@ -149,6 +157,35 @@ function stop_task(index) {
                 alert('停止任务成功')
             } else {
                 alert('停止失败，请重试')
+            }
+        })
+}
+
+function check_detail(index, loop) {
+    var timer = 5000
+    var task_log_id = get_task_log_id(index)
+    var title = $('#template-main').datagrid('getRows')[index]['task-target']
+    $('#detail_show_view').dialog({onBeforeClose:function() {
+        window.clearInterval(interval)
+    }})
+    $('#detail_show_view').dialog('setTitle', '任务 —— ' + title)
+    $('#detail_show_view').dialog('open')
+    $('#show_main').val('')
+    if (loop == 'yes') {
+        var interval = setInterval(function(){
+            get_detail_msg(task_log_id)
+        },timer)
+    } else {
+        get_detail_msg(task_id)
+    }
+}
+
+function get_detail_msg(task_id) {
+    $.post('/tasks/detail-msg/',
+        {'task-log-id' : task_id},
+        function(data, status) {
+            if (status == 'success') {
+                $('#show_main').val(data['data'])
             }
         })
 }

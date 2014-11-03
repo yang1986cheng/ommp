@@ -222,7 +222,8 @@ def task_in_process(request):
     page = po.get('page', '')
     rows = po.get('rows', '')
     r_from, r_end = base.sum_page_from_to_end(page, rows)
-    tasks = Task_logs.objects.exclude(status_code = 4)[r_from:r_end]
+#    tasks = Task_logs.objects.exclude(status_code = 4)[r_from:r_end]
+    tasks = Task_logs.objects.all()
     task_total = tasks.count()
     t_list = []
     
@@ -270,6 +271,20 @@ def parse_config(task_id):
     return_config = dict(t, **config)
     
     return return_config
+
+
+@login_required
+@csrf_protect
+def get_detail_msg(request):
+    task_id = request.REQUEST.get('task-log-id', '')
+    
+    if not task_id:
+        raise Http404
+    
+    task_logs = Task_logs.objects.get(id = task_id)
+    raw_json = {'data' : task_logs.status}
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
+    
     
 
 

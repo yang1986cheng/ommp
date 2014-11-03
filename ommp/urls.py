@@ -75,6 +75,7 @@ urlpatterns = patterns('',
                        url(r'tasks/delete-task/$', 'ommp.task.views.delete_task'),
                        url(r'tasks/in-process/$', 'ommp.task.views.in_process'),
                        url(r'tasks/task-in-process/$', 'ommp.task.views.task_in_process'),
+                       url(r'tasks/detail-msg/$', 'ommp.task.views.get_detail_msg'),
                        
                        #about task controller
                        url(r'tasks/start-process/$', 'ommp.task.views.start_process'),

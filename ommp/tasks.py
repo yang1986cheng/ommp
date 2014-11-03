@@ -44,7 +44,11 @@ class DeployThreads(threading.Thread):
                 status = '%s:Done' % (h)
                 
             if mutex.acquire(1):
-                if _sync_status_detail_db(task, status = status):
+                try:
+                    _sync_status_detail_db(task, status = status)
+                except:
+                    pass
+                finally:
                     mutex.release()
         
         
@@ -66,7 +70,7 @@ def _sync_status_detail_db(task_id, **kwargs):
             if k == 'status':
                 detail = '' if not task_log.status else task_log.status
                 detail += kwargs[k]
-                task_log.status = detail + '<br>'
+                task_log.status = detail + '\n'
             elif k == 'end_time':
                 task_log.end_time = kwargs[k]
             elif k == 'status_code':
@@ -155,7 +159,7 @@ def start_deploy(config):
                                    status_code = '1',
                                    back_file = file,
                                    back_file_code = file_code,
-                                   status = 'backup:success<br>backup_file:%s' % file
+                                   status = 'backup:success\nbackup_file:%s' % file
                                    )
         else:
             _sync_status_detail_db(task, 
