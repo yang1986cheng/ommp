@@ -2,7 +2,7 @@ $(document).ready(function(){
 
     $('#template-main').datagrid({
         queryParams:{ 'list-type':'1'},
-        url:'/tasks/task-in-process/',
+        url:'/tasks/list-task-log/',
         title:'任务执行列表',
         fit:true,
         iconCls:'icon-filter',
@@ -22,6 +22,7 @@ $(document).ready(function(){
             {field:'operate-user', title:'操作人', width:40},
             {field:'add-time', title:'创建时间', width:40},
             {field:'start-time', title:'启动时间', width:40},
+            {field:'end-time', title:'完成时间', width:40},
             {
                 field:'status-name',
                 title:'任务状态',
@@ -40,6 +41,12 @@ $(document).ready(function(){
                     if (row['status-code'] == 3) {
                         return '停止...'
                     }
+                    if (row['status-code'] == 4) {
+                        return '完成'
+                    }
+                    if (row['status-code'] == 5) {
+                        return '被取消'
+                    }
                 }
             },
             {
@@ -48,7 +55,7 @@ $(document).ready(function(){
                 width:20,
                 align:'center',
                 formatter:function(value, row, index) {
-                    return "<a href='javascript:void(0)' onclick='check_detail(" + index + ", \"yes\")'>点击查看</a>"
+                    return "<a href='javascript:void(0)' onclick='check_detail(" + index + ", \"no\")'>点击查看</a>"
                 }
             },
             {
@@ -56,14 +63,18 @@ $(document).ready(function(){
                 title:'操作', width:20,
                 align:'center',
                 formatter:function(value, row, index){
-                    if (row['status-code'] == 0 || row['status-code'] == 4)
-                        return "<a href='javascript:void(0)' onclick='start_task(" + index + ")'>启动</a>&nbsp&nbsp<a href='javascript:void(0)' onclick='end_task(" + index + ")'>取消</a>"
+                    if (row['status-code'] == 0)
+                        return "<a href='javascript:void(0)' onclick='start_task(" + index + ")'>启动</a>&nbsp&nbsp<a href='javascript:void(0)' onclick='end_task(" + index + ")'>结束任务</a>"
                     if (row['status-code'] == 1)
-                        return "<a href='javascript:void(0)' onclick='stop_task(" + index + ")'>停止</a>"
+                        return "<a href='javascript:void(0)' onclick='start_task(" + index + ")'>暂停</a>&nbsp&nbsp<a href='javascript:void(0)' onclick='stop_task(" + index + ")'>停止</a>"
                     if (row['status-code'] == 2)
                         return "<a href='javascript:void(0)' onclick='restart_task(" + index + ")'>重新执行</a>"
                     if (row['status-code'] == 3)
                         return "<a href='javascript:void(0)' onclick='continue_task(" + index + ")'>继续执行</a>"
+                    if (row['status-code'] == 4)
+                        return "<a href='javascript:void(0)' onclick='redo_task(" + index + ")'>恢复此次发布</a>"
+                    if (row['status-code'] == 5)
+                        return "不可操作"
                 }
             }
         ]]
@@ -161,6 +172,19 @@ function stop_task(index) {
         })
 }
 
+function redo_task(index) {
+    var task_log_id = get_task_log_id(index)
+    $.post('/tasks/redo-task/',
+        {'task-log-id' : task_log_id},
+        function(data, status) {
+            if (status == 'success' && data['status'] == 'success') {
+                alert('恢复任务启动成功')
+            } else {
+                alert('停止失败，请重试')
+            }
+        })
+}
+
 function check_detail(index, loop) {
     var timer = 5000
     var task_log_id = get_task_log_id(index)
@@ -176,7 +200,7 @@ function check_detail(index, loop) {
             get_detail_msg(task_log_id)
         },timer)
     } else {
-        get_detail_msg(task_id)
+        get_detail_msg(task_log_id)
     }
 }
 

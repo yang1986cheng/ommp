@@ -7,6 +7,7 @@ import json
 import ommp.resources.base as base
 from ommp.models import Projects, Relations, IPs, Templates, Task_logs
 import salt.client as client
+from ommp.celery import app
 
 from django.core.signals import request_finished
 import time
@@ -19,6 +20,9 @@ def tasks(request):
 
 def in_process(request):
     return render_to_response('task-in-process.html', context_instance=RequestContext(request))
+
+def task_logs(request):
+    return render_to_response('deploy-logs.html', context_instance=RequestContext(request))
 
 @login_required
 @csrf_protect
@@ -222,8 +226,8 @@ def task_in_process(request):
     page = po.get('page', '')
     rows = po.get('rows', '')
     r_from, r_end = base.sum_page_from_to_end(page, rows)
-#    tasks = Task_logs.objects.exclude(status_code = 4)[r_from:r_end]
-    tasks = Task_logs.objects.all()
+    tasks = Task_logs.objects.extra(where = ['status_code not in (4, 5)'])[r_from:r_end]
+#    tasks = Task_logs.objects.all()
     task_total = tasks.count()
     t_list = []
     
@@ -242,6 +246,34 @@ def task_in_process(request):
     raw_json = {'total' : task_total, 'rows' : t_list}
     return HttpResponse(json.dumps(raw_json), content_type="application/json")
 
+@login_required
+@csrf_protect    
+def list_task_log(request):
+    po = request.REQUEST
+    page = po.get('page', '')
+    rows = po.get('rows', '')
+    r_from, r_end = base.sum_page_from_to_end(page, rows)
+    tasks = Task_logs.objects.extra(where = ['status_code in (4, 5)'])[r_from:r_end]
+#    tasks = Task_logs.objects.all()
+    task_total = tasks.count()
+    t_list = []
+    
+    for task in tasks:
+        r = {'task-id' : task.id,
+             'status-code' : task.status_code,
+             'config' : task.config,
+             'task-log-id' : task.task_log_id,
+             'task-target' : task.template.name,
+             'operate-user' : task.oper_user.username,
+             'add-time' : str(task.add_time),
+             'end-time' : str(task.end_time),
+             'start-time' : str(task.start_time),
+             }
+        t_list.append(r)
+        
+    raw_json = {'total' : task_total, 'rows' : t_list}
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
+
 def parse_config(task_id):
     task = Task_logs.objects.get(id = task_id)
     config = eval(task.config)
@@ -252,20 +284,28 @@ def parse_config(task_id):
         project = Templates.objects.get(id = task.template.id).project.id
         total_ip = Relations.objects.filter(project = project, relation_type =  1)
         for h in total_ip:
+            x = []
             ip = h.pro_ip.ip
             login_name = h.pro_ip.servers.login_name
             host = login_name + '@' + ip
-            ips.append(host)
+            x.append(host)
+            host_name = h.pro_ip.servers.hostname
+            x.append(host_name)
+            ips.append(x)
 
     else:
         r = config['hosts']
         ip_ids = r.split(',')
         total_ip = IPs.objects.filter(pk__in = ip_ids)
         for h in total_ip:
+            x = []
             ip = h.ip
             login_name = h.servers.login_name
             host = login_name + '@' + ip
-            ips.append(host)
+            x.append(host)
+            host_name = h.servers.hostname
+            x.append(host_name)
+            ips.append(x)
     t = {}
     t['do_hosts'] = ips
     return_config = dict(t, **config)
@@ -299,8 +339,12 @@ def start_process(request):
     config = parse_config(task_id)
     config['task_id'] = task_id
     re = start_deploy.delay(config)
+    tlog = Task_logs.objects.get(id = task_id)
+    tlog.job_id = re
     
-    return HttpResponse(config)
+    raw_json = {'status' : 'success'} if tlog.save() == None else {'status' : 'failed'}
+    
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
 
 @login_required
 @csrf_protect
@@ -320,13 +364,27 @@ def continue_process(request):
 @login_required
 @csrf_protect
 def end_process(request):
-    pass
+    task_log_id = request.REQUEST.get('task-log-id', '')
+    if not task_log_id:
+        raise Http404
+    
+    tlog = Task_logs.objects.get(id = task_log_id)
+    tlog.status_code = 5
+    raw_json = {'status' : 'success'} if tlog.save() == None else {'status' : 'failed'}
+    
+    return HttpResponse(json.dumps(raw_json), content_type="application/json")
+    
 
 @login_required
 @csrf_protect
 def stop_process(request):
-    pass
-
+    task_log_id = request.REQUEST.get('task-log-id', '')
+    if not task_log_id:
+        raise Http404
+    
+    jid = Task_logs.objects.get(id = task_log_id).job_id
+    x = app.control.revoke(jid, terminate=True)
+    return HttpResponse(x)
 
         
     

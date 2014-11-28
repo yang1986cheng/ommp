@@ -30,14 +30,17 @@ def handler_command(request):
             host = ip.pro_ip.servers.hostname
             hosts.append(host)
         cl = client.LocalClient()
-        re = cl.cmd(hosts,'cmd.run',[command],expr_form='list')
+        try:
+            re = cl.cmd(hosts,'cmd.run',[command],expr_form='list')[host]
+        except:
+            re = 'Not Return'
         
         raw_str = []
         for ip in ips:
             host = ip.pro_ip.servers.hostname
             r = {'exec-host-name' : host,
                  'exec-ip' : ip.pro_ip.ip,
-                 'exec-result' : re[host],
+                 'exec-result' : re,
                  'exec-idc' : ip.pro_ip.idc.idc_name,
                  }
             raw_str.append(r)

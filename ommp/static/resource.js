@@ -1,142 +1,239 @@
-$(document).ready(function() {
-    $('.idc-detail-list input').each(function() {$(this).attr('disabled', 'true')})
-    $("div.idc-noitem").click(function(){
-        $("div.mask").show();
-        $("div.add-idc").show();
-    });
+$(document).ready(function(){
 
-    $("input.add-cancel").click(function() {
-        $("div.mask").hide();
-        $("div.add-idc").hide();
-    });
-
-    $('div.idc-item').click(function() {
-        var vv = $(this).children(".idc-item-hidden").val();
-        $.post("/resource/idc-detail/",
-            {"idc-id" : vv},
-            function(data, status) {
-                if (status == "success") {
-                    $('#idc-detail-name').attr('value',data['idc_name']);
-                    $('#idc-detail-zipcode').numberbox('setValue',data['zipcode']);
-                    $('#idc-detail-contact').attr('value',data['contact']);
-                    $('#idc-detail-phone').numberbox('setValue',data['phone']);
-                    $('#idc-detail-email').attr('value',data['email']);
-                    $('#idc-detail-date').datebox('setValue',data['end_date']);
-                    $('#idc-detail-address').attr('value',data['address']);
-                    $('#idc-detaid-idc-id').attr('value',data['id'])
-                    $('.idc-detail-list input').each(function() {$(this).attr('disabled', 'true')})
-
-                    idc_name = "机房详情-" + data['idc_name']
-                    $('#idc-detail').dialog({title:idc_name})
-                    $("#idc-detail").window("open");
-                    $("#idc-detail").window("center");
-                } else {alert("获取资料失败，请重试!")}
-            })
-    })
-
-    $('#add-idc-div').dialog({
-        width:200,
-        height:540,
-        title:'添加机房信息',
-        closed : true,
-        minimizable:false,
-        maximizable:false,
-        closable:true,
-        modal:true,
-        iconCls:'icon-add',
-        buttons:[{
-            text:'Add',
+    $('#idcs-show-list').datagrid({
+        url:'/resource/list-idcs/',
+        title:'机房信息',
+        fit:true,
+        iconCls:'icon-filter',
+        fitColumns:true,
+        rownumbers:true,
+        collapsible:true,
+        pagination:true,
+        loadMsg:"加载中,请稍候...",
+        singleSelect:true,
+        striped:true,
+        columns:[[
+//            {field:'idc-id':title:'ID',with 5},
+            {field:'idc-name', title:'名称', width:40},
+            {field:'end-date', title:'到期日期', width:40},
+            {field:'idc-contacts', title:'联系人', width:40},
+            {field:'cellphone-num', title:'手机号码', width:40},
+            {field:'phone-num', title:'联系电话', width:40},
+            {field:'email-addr', title:'联系邮箱', width:40},
+            {field:'idc-post', title:'邮编', width:20},
+            {
+                field:'idc-address',
+                title:'地址',
+                width:80,
+                formatter:function(value, row, index) {
+                    return value + "<span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<a href='javascript:void(0)' onclick='modify_addr(" + index + ")'>修改</a></span>"
+                }
+            },
+            {
+                field:'idc-summary',
+                title:'操作',
+                align:'center',
+                formatter:function(value, row, index) {
+                    return "<a href='javascript:void(0)' onclick='open_summary(" + index + ")'>资源概况</a>"
+                }
+            }
+        ]],
+        onSelect:function(rowIndex, rowData) {
+            $('#btn-update').linkbutton('enable')
+            $('#btn-del').linkbutton('enable')
+        },
+        onDblClickRow:function () {
+            update_idc_detail()
+        },
+        toolbar:[{
+            id:'btn-add',
+            text:'添加',
             iconCls:'icon-add',
-            handler:function() { 
-                $.post("/resource/add-idc/",
-                    $("form.add-form").serialize(),
-                    function(data, status) {
-                        if (status == "success") {
-                            alert("添加成功!")
-                            parent.location.reload();
-                        } else {
-                            alert("添加失败!")
-                        }
-                    })
+            handler:function(){
+                $('#add-idc-div').dialog('open')
             }
         },{
-            text:'Cancel',
-            iconCls:'icon-cancel',
-            handler:function(){$('#add-idc-div').window('close')}
-        }]
-    })
-
-
-
-    $('#idc-detail').dialog({
-        width:800,
-        height:450,
-        title:'机房详细信息',
-        closed : true,
-        minimizable:false,
-        maximizable:false,
-        closable:true,
-        modal:true,
-        iconCls:'icon-add',
-        toolbar:[{
-            text:'修改',
+            id:'btn-update',
+            text:"更新",
             iconCls:'icon-edit',
+            disabled:true,
             handler:function() {
-            	$('#save-change').linkbutton('enable');
-                $('.idc-detail-list input').each(function() {$(this).removeAttr('disabled')})
+                update_idc_detail()
             }
         },'-',{
-        	id:'save-change',
-            text:'保存',
-            iconCls:'icon-save',
+            id:'btn-del',
+            text:'删除',
+            iconCls:'icon-clear',
             disabled:true,
             handler:function(){
-            		$('#save-change').linkbutton('disable');
-                    $.post("/resource/update-idc/",
-                        $("form.idc-detail-form").serialize(),
-                        function(data, status) {
-                            if (status == "success" && data['status'] == 'success') {
-                                alert("修改成功!")
-                                parent.location.reload();
-                            } else {
-                                alert("修改失败!")
-                            }
-                        })
-            }
-        },'-',{
-            text:'删除',
-            iconCls:'icon-no',
-            handler:function() {
-                $.messager.confirm('删除确认', '请确认需要删除该机房信息!<br><br>该操作将不可撤销!', function(r){
+                $.messager.confirm('删除确认', '请确认需要删除该任务信息!<br><br>该操作将不可撤销!', function(r){
                     if (r){
-                        var id= $('#idc-detaid-idc-id').val()
-                        $.post('/resource/del-idc/',
-                        {'idc-id':id},
-                        function(data, status) {
-                            if(status == 'success' && data['status'] == 'success') {
-                                alert("删除成功!")
-                                parent.location.reload()
-                            } else {alert("删除失败，请重试!")}
-                        })
+                        var val = $('#idcs-show-list').datagrid('getSelected')
+                        if (val) {
+                            var sid=val['idc-id']
+                            $.post('/resource/del-idc/',
+                                {'idc-id':sid},
+                                function(data, status) {
+                                    if(status == 'success' && data['status'] == 'success') {
+                                        alert("删除成功!")
+                                        $('#template-main').datagrid('reload')
+                                    } else {alert(data['data'])}
+                                })
+                        }
                     }
                 });
             }
-        }],
-        buttons:[{
-            text:'OK',
-            iconCls:'icon-ok',
-            handler:function() {$('#idc-detail').window('close')}
         }]
     })
-});
+    var p = $('#idcs-show-list').datagrid('getPager');
+    $(p).pagination({
+        pageSize:10,
+        pageList:[10,30,50,100],
+        beforePageText:'第',
+        afterPageText:'页 共 {pages} 页',
+        displayMsg:'当前显示 {from} - {to} 条记录   共 {total} 条记录'
+    })
+})
 
-
-
-function open_add_idc_div() {
-    $('#add-idc-div').window("open");
-    $('#add-idc-div').window('center')
+function commit_add_idc() {
+    if ($('#add-form-id').form('validate')) {
+        $.post('/resource/add-idc/',
+            $('#add-form-id').serialize(),
+            function(data, status) {
+                if (status == 'success') {
+                    alert('添加成功')
+                    $('#add-idc-div').dialog('close')
+                    $('#idcs-show-list').datagrid('reload')
+                }
+            })
+    } else { return false }
 }
 
-function close_add_idc_div() {
-    $('#add-idc-div').window('close');
+function do_cancel(bid) {
+    $(bid).dialog('close')
 }
+
+function modify_addr(index) {
+    $('#modify-addr').dialog('open')
+    var idc_id = $('#idcs-show-list').datagrid('getRows')[index]['idc-id']
+    $('#modify-addr-idc-id').attr('value', idc_id)
+}
+
+function commit_modify_addr() {
+    if ($('#modify-addr-form').form('validate')) {
+        $.post('/resource/modify-addr/',
+            $('#modify-addr-form').serialize(),
+            function(data, status) {
+                if (status == 'success') {
+                    alert('修改成功')
+                    $('#idcs-show-list').datagrid('reload')
+                    do_cancel('#modify-addr');
+                }
+            })
+    } else { return false }
+}
+
+function update_idc_detail() {
+    var row = $('#idcs-show-list').datagrid('getSelected')
+    $('#idc-up-idc-id').attr('value', row['idc-id'])
+    $('#idc-up-name').val(row['idc-name'])
+    $('#idc-up-contact').val(row['idc-contacts'])
+    $('#idc-up-cellphone').numberbox('setValue', row['cellphone-num'])
+    $('#idc-up-phone').numberbox('setValue', row['phone-num'])
+    $('#idc-up-email').val(row['email-addr'])
+    $('#idc-up-end-date').datebox('setValue',row['end-date'])
+    $('#idc-update').dialog('open')
+}
+
+function commit_update_idc() {
+    if ($('#idc-up-form').form('validate')) {
+        $.post('/resource/update-idc/',
+            $('#idc-up-form').serialize(),
+            function(data, status) {
+                if (status == 'success') {
+                    alert('修改成功')
+                    $('#idcs-show-list').datagrid('reload')
+                    do_cancel('#idc-update');
+                }
+            })
+    } else { return false }
+}
+
+function open_summary(index) {
+    $('#resource-summary').dialog('open')
+    $('#resource-summary-detail').datagrid({
+        queryParams:{
+            'idc-id' : $('#idcs-show-list').datagrid('getRows')[index]['idc-id']
+        },
+        url:'/resource/idc-summary/',
+        fit:true,
+        iconCls:'icon-filter',
+        fitColumns:true,
+        collapsible:true,
+        loadMsg:"加载中,请稍候...",
+        singleSelect:true,
+        striped:true,
+        columns:[[
+            {field:'resource-name', title:'名称', width:40},
+            {
+                field:'total-num',
+                title:'总数',
+                width:40,
+                align:'center',
+                formatter:function(value, row, index) {
+                    if (value == -1) {
+                        return '-'
+                    } else {return value}
+                }
+            },
+            {
+                field:'be-used',
+                title:'已使用',
+                width:40,
+                align:'center',
+                formatter:function(value, row, index) {
+                    if (value == -1) {
+                        return '--'
+                    } else {return value}
+                }
+            },
+            {
+                field:'available-num',
+                title:'可使用',
+                width:40,
+                align:'center',
+                formatter:function(value, row, index) {
+                    if (value == -1) {
+                        return '--'
+                    } else {return value}
+                }
+            },
+            {
+                field:'other-num',
+                title:'其它状态',
+                width:40,
+                align:'center',
+                formatter:function(value, row, index) {
+                    if (value == -1) {
+                        return '--'
+                    } else {return value}
+                }
+            }
+        ]]
+    })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

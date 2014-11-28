@@ -4,6 +4,8 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, RequestContext
 from django.views.decorators.csrf import csrf_protect
 import json
+from ommp.models import Task_logs, Templates
+from django.contrib.auth.views import logout
 
 def index(request):
     return render_to_response('test.html')
@@ -21,7 +23,13 @@ def side(request):
     return render_to_response('side.html')
         
 def test(request):
-    return HttpResponseRedirect('/management/')
+    t = Templates.objects.get(id = '1')
+    return HttpResponse(t.exclude_files)
+
+def m_logout(request):
+    logout(request)
+    return HttpResponse('<script>parent.location.href="/management/"</Script>')
+    
     
     
     

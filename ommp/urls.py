@@ -5,6 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+                       url(r'^test/test/$', 'ommp.views.test'),
 #                       url(r'^admin/', include(admin.site.urls)),
 #                       url(r't/', 'ommp.views.test'),
                        url(r'^$', 'ommp.views.index'),
@@ -19,17 +20,24 @@ urlpatterns = patterns('',
                        url(r'resource/del-idc/$', 'ommp.resources.views.del_idc'),
                        url(r'resource/update-idc/$', 'ommp.resources.views.update_idc_info'),
                        url(r'resource/get-idcs/$', 'ommp.resources.views.get_idcs'),
+                       url(r'resource/list-idcs/$', 'ommp.resources.views.list_idcs'),
+                       url(r'resource/modify-addr/$', 'ommp.resources.views.modify_addr'),
+                        url(r'resource/idc-summary/$', 'ommp.resources.views.idc_summary'),
                        
                        #normal
                        url(r'resource/get-users/$', 'ommp.resources.views.get_users'),
                        url(r'accounts/login/$', login, {'template_name' : 'login.html', 'redirect_field_name' : '/management/'}),
+                       url(r'accounts/logout/$', 'ommp.views.m_logout'),
                        
                        #about servers
                        url(r'resource/servers/$', 'ommp.resources.views.servers'),
+                       url(r'resource/get-father-servers/$', 'ommp.resources.views.get_father_servers'),
+                       url(r'resource/update-father-servers/$', 'ommp.resources.views.update_father_servers'),
                        url(r'resource/get-servers/$', 'ommp.resources.views.get_servers'),
                        url(r'resource/add-server/$', 'ommp.resources.views.add_server'),
                        url(r'resource/del-server/$', 'ommp.resources.views.del_server'),
                        url(r'resource/update-server/$', 'ommp.resources.views.update_server'),
+                       url(r'resource/import-server/$', 'ommp.resources.views.import_server'),
                        
                        
                        
@@ -76,6 +84,8 @@ urlpatterns = patterns('',
                        url(r'tasks/in-process/$', 'ommp.task.views.in_process'),
                        url(r'tasks/task-in-process/$', 'ommp.task.views.task_in_process'),
                        url(r'tasks/detail-msg/$', 'ommp.task.views.get_detail_msg'),
+                       url(r'tasks/task-logs/$', 'ommp.task.views.task_logs'),
+                       url(r'tasks/list-task-log/$', 'ommp.task.views.list_task_log'),
                        
                        #about task controller
                        url(r'tasks/start-process/$', 'ommp.task.views.start_process'),

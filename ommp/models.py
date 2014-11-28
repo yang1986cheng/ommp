@@ -10,11 +10,12 @@ class IDCs(models.Model):
     address = models.CharField(max_length = 50)
     display_addr = models.CharField(max_length = 20)
     contact = models.CharField(max_length = 4)
-    phone_num = models.CharField(max_length = 12)
+    cellphone_num = models.CharField(max_length = 12, null = True)
+    phone_num = models.CharField(max_length = 12, null = True)
     email = models.EmailField(max_length = 50)
     code = models.IntegerField(max_length = 6)
     add_time = models.DateTimeField()
-    end_date = models.CharField(max_length = 10)
+    end_date = models.CharField(max_length = 10, null = True)
     
 class Cabinets(models.Model):
     name = models.CharField(max_length = 30)
@@ -43,7 +44,7 @@ class Projects(models.Model):
 class Servers(models.Model):
     name = models.CharField(max_length = 30)
     idc = models.ForeignKey(IDCs)
-    cabinets = models.ForeignKey(Cabinets, related_name='cab_name')
+    cabinets = models.ForeignKey(Cabinets, related_name='cab_name', null = True)
     os = models.CharField(max_length = 30)
     size = models.CharField(max_length = 10)
     parts = models.CharField(max_length = 30)
@@ -52,7 +53,7 @@ class Servers(models.Model):
     add_date = models.CharField(max_length = 10)
     end_date = models.CharField(max_length = 10)
     father = models.ForeignKey('self', null = True)
-    used_type = models.IntegerField(max_length = 1)
+    used_type = models.IntegerField(max_length = 1)             #0:testing 1:product 2:disabled 3:available
     admin = models.ForeignKey(User)
     
 class IPs(models.Model):
@@ -95,13 +96,14 @@ class Templates(models.Model):
     
 class Task_logs(models.Model):
     task_log_id = models.CharField(db_index = True, max_length = 20)
+    job_id = models.CharField(db_index = True, max_length = 36)
     template = models.ForeignKey(Templates)
     config = models.TextField()
     add_time = models.DateTimeField()
     start_time = models.DateTimeField(null = True)
     end_time = models.DateTimeField(null = True)
     oper_user = models.ForeignKey(User)
-    status_code = models.IntegerField(max_length = 1, db_index = True)                       #0:pending, 1:doing, 2:pause, 3:terminated, 4:done, 
+    status_code = models.IntegerField(max_length = 1, db_index = True)                       #0:pending, 1:doing, 2:pause, 3:terminated, 4:done, 5: cancel
     status = models.TextField(null = True)
     back_file = models.CharField(max_length = 120, null = True)
     back_file_code = models.CharField(max_length = 32, null = True)

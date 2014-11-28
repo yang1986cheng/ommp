@@ -22,6 +22,7 @@ $(document).ready(function(){
         rownumbers:true,
         collapsible:true,
         pagination:true,
+        pageSize:30,
         loadMsg:"加载中,请稍候...",
         singleSelect:true,
         striped:true,
@@ -34,18 +35,57 @@ $(document).ready(function(){
 //            {field:'father-id', title:'fid'},
             {field:'svr-name', title:'编号', width:40},
             {field:'idc-name', title:'所在机房', width:40},
-            {field:'cab-name', title:'所属机柜', width:40},
-            {field:'svr-size', title:'规格', width:20},
+//            {
+//                field:'cab-name',
+//                title:'所属机柜',
+//                width:40,
+//                formatter:function(value, row, index) {
+//                    if (value == 0) {
+//                        return '未指派'
+//                    } else {
+//                        return value
+//                    }
+//                }
+//            },
+            {field:'svr-size', title:'类型', width:20},
             {field:'svr-parts', title:'配置', width:60},
             {field:'svr-os', title:'操作系统', width:40},
             {field:'svr-hostname', title:'计算机名', width:40},
             {field:'svr-username', title:'登录用户', width:40},
             {field:'storage-date', title:'入库日期', width:40},
-            {field:'storage-date', title:'入库日期', width:40},
             {field:'end-date', title:'到期日期', width:40},
-            {field:'svr-father', title:'父级', width:40},
-            {field:'svr-usable', title:'类型', width:20},
-            {field:'admin-name', title:'负责人', width:40}
+            {
+                field:'svr-father',
+                title:'父级',
+                width:40,
+                formatter:function(value, row, index) {
+                    if (value == '无') {
+                        return value + "&nbsp&nbsp&nbsp&nbsp&nbsp<span><a href='javascript:void(0)' onclick='update_father_server(" + index + ")'>指定</a></span>"
+                    } else {
+                        return value + "&nbsp&nbsp&nbsp&nbsp&nbsp<span><a href='javascript:void(0)' onclick='update_father_server(" + index + ")'>修改</a></span>"
+                    }
+                }
+            },
+            {
+                field:'svr-usable',
+                title:'状态',
+                width:20,
+                formatter:function(value, row, index) {
+                    if (value == 0) {
+                        return '测试'
+                    }
+                    if (value == 1) {
+                        return '生产'
+                    }
+                    if (value == 2) {
+                        return '禁用'
+                    }
+                    if (value == 3) {
+                        return '空闲'
+                    }
+                }
+            },
+            {field:'admin-name', title:'负责人', width:20}
         ]],
         onSelect:function(rowIndex, rowData) {
             $('#btn-update').linkbutton('enable')
@@ -103,11 +143,61 @@ $(document).ready(function(){
                     }
                 });
             }
+        }, '-', {
+            id:'btn-import',
+            text:'批量导入',
+            iconCls:'icon-reload',
+            handler:function(){
+                $.messager.defaults={ok:'知道了', cancel:'太难、弃疗'}
+                $.messager.alert('导入使用提示','1、支持03、07格式的Excel文件<br>' +
+                    '2、每行一条服务器记录<br>' +
+                    '3、每行12条信息，和列表信息一一对应<br>' +
+                    '4、其中机房、状态、负责人填入对应ID<br>' +
+                    '5、类型合法值包括xU、塔式、刀柜、刀片、虚拟机<br>' +
+                    '6、ID可在导航栏查询<br>' +
+                    '7、父级默认为无，随意填写','', function(){
+                    $('#btn-import-1').window('open')
+                })
+
+            }
+        }, '-', {
+            id:'btn-idc-id',
+            text:'机房ID',
+            iconCls:'icon-help',
+            handler:function(){
+                $('#btn-idc-id-combobox').combobox({
+                    url:'/resource/get-idcs/',
+                    onSelect:function(rec){
+                        alert('机房：' + rec.name + '\nID：' + rec.id)
+                    }
+                })
+                $('#btn-idc-id-1').window('open')
+            }
+        }, '-', {
+            id:'btn-status-id',
+            text:'状态ID',
+            iconCls:'icon-help',
+            handler:function(){
+                alert('测试：0\n生产：1\n禁用：2\n空闲：3\n')
+            }
+        }, '-', {
+            id:'btn-admin-id',
+            text:'负责人ID',
+            iconCls:'icon-help',
+            handler:function(){
+                $('#btn-admin-id-combobox').combobox({
+                    url:'/resource/get-users/',
+                    onSelect:function(rec){
+                        alert('机房：' + rec.username + '\nID：' + rec.id)
+                    }
+                })
+                $('#btn-admin-id-1').window('open')
+            }
         }]
     })
     var p = $('#svr-display-table').datagrid('getPager');
     $(p).pagination({
-        pageSize:10,
+        pageSize:30,
         pageList:[10,30,50,100],
         beforePageText:'第',
         afterPageText:'页 共 {pages} 页',
@@ -137,9 +227,9 @@ function open_update_window() {
     if (val) {
         var usable = val['svr-used-type']
         var x =[]
-        var key = ['测试','生产','不可用']
+        var key = ['测试','生产','禁用', '空闲']
         var s
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < 4; i++) {
             if (usable == i) {
                 s = {id:i,name:key[i],selected:true}
             } else {
@@ -206,19 +296,35 @@ function svr_update_commit() {
         })
 }
 
-function svr_update_cancel() {
-    $('#svr-update-div').dialog('close')
+function svr_update_cancel(sid) {
+    $(sid).dialog('close')
+}
+
+function check_none_cab_selected() {
+    if ($('#svr-none-cab').is(":checked")) {
+        $('#svr-add-cab').combobox('disable')
+        $('#svr-add-cab').combobox('setValue','0')
+    } else {
+        var idc = $('#svr-add-idc').combobox('getValue')
+        $('#svr-add-cab').combobox({
+            url:'/resource/get-cabs/',
+            onBeforeLoad:function(param) {
+                param.idcid = idc;
+            },
+            disabled:false
+        })
+    }
 }
 
 function check_father_selected() {
     if (!$('#svr-none-father').is(":checked")) {
         $('#svr-add-father').combobox('disable')
     } else {
-        var cab = $('#svr-add-cab').combobox('getValue')
+        var idc = $('#svr-add-idc').combobox('getValue')
         $('#svr-add-father').combobox({
-            url:'/resource/get-servers/',
+            url:'/resource/get-father-servers/',
             onBeforeLoad:function(param) {
-                param.cab = cab;
+                param.idc = idc;
             },
             disabled:false
         })
@@ -288,6 +394,37 @@ function father_tip() {
 function get_cab_base_on_idc() {
     var iid = $('#svr-add-idc').combobox().getValue()
     alert(iid)
+}
+
+function update_father_server(index) {
+    var val = $('#svr-display-table').datagrid('getRows')[index]
+    var idc_id = val['idc-id']
+    var svr_id = val['svr-id']
+    $('#up-father-svr').dialog('open')
+    $('#up-father-idc-id').attr('value', idc_id)
+    $('#up-father-svr-id').attr('value', svr_id)
+    $('#up-father-father-id').combobox({
+        onBeforeLoad:function(param) {
+            param.idc = idc_id
+        },
+        url:'/resource/get-father-servers/'
+    })
+}
+
+function commit_up_father_svr() {
+    if ($('#up-father-svr-form').form('validate')) {
+        $.post('/resource/update-father-servers/',
+            $('#up-father-svr-form').serialize(),
+            function(data, status) {
+                if (status == 'success' && data['status'] == 'success') {
+                    alert('修改成功')
+                    svr_update_cancel('#up-father-svr')
+                    $('#svr-display-table').datagrid('reload')
+                } else {
+                    alert('修改失败')
+                }
+            })
+    } else { return false }
 }
 
 

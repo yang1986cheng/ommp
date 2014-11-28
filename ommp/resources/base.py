@@ -10,7 +10,7 @@ def get_post_val(request):
     val = {'address' : request.get('address', ''),
            'zipcode' : request.get('zipcode', ''),
            'contact' : request.get('contact', ''),
-           'phone' : request.get('phone', ''),
+           'phone_num' : request.get('phone-num', ''),
            'email' : request.get('email', ''),
            'idc_name' : request.get('idc-name', ''),
            'provinces' : request.get('provinces', ''),
@@ -18,7 +18,8 @@ def get_post_val(request):
            'city' : request.get('city', ''),
            'end_date' : request.get('end-date', ''),
            'idc_id' : request.get('idc_id', ''),
-           'address' : request.get('address', '')
+           'address' : request.get('address', ''),
+           'cellphone_num' : request.get('cellphone-num', ''),
            }
     return val
 

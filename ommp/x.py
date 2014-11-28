@@ -9,37 +9,35 @@
 #        self.deploy_command = deploy_command
 #        self.after_command = after_command
 
-#import threading
-#import time
-#
-#class MyThread(threading.Thread):
-#    def run(self):
-#        self.ss()
-#            
-#    def ss(self):
-#        global num
-#        time.sleep(1)
-#        if mutex.acquire(1):  
-#            num = num+1
-#            msg = self.name+' set num to '+str(num)
-#            print msg
-#            mutex.release()
-#        
-#num = 0
-#mutex = threading.Lock()
-#
-#def test():
-#    for i in range(5):
-#        t = MyThread()
-##        t.setDaemon(True)
-#        t.start()
-#        if i == 4:
-#            t.join()
-#        
-#    
-#if __name__ == '__main__':
-#    test()
-#    print threading.activeCount()
+import threading
+import time
+
+class MyThread(threading.Thread):
+    def run(self):
+        global num
+        time.sleep(1)
+        if mutex.acquire(1):
+            num = num+1
+            msg = self.name+' set num to '+str(num)
+            print msg
+            mutex.release()
+            
+num = 0
+mutex = threading.Lock()
+
+def test():
+    for i in range(5):
+        t = MyThread()
+#        t.setDaemon(True)
+        t.start()
+#        t.join()
+        if i == 4:
+            t.join()
+        
+    
+if __name__ == '__main__':
+    test()
+    print 'threading.activeCount()'
 
 
 
@@ -100,10 +98,9 @@
 #    
 #print t
     
-
-a = ['a', 'b']
-
-print '--exclude ' + ' --exclude '.join(a)
+#import os
+#
+#print os.path.basename(os.path.abspath('/home/leal/'))
 
 
 

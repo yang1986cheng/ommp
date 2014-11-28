@@ -9,6 +9,7 @@ $(document).ready(function(){
         rownumbers:true,
         collapsible:true,
         pagination:true,
+        pageSize:50,
         loadMsg:"加载中,请稍候...",
         singleSelect:true,
         striped:true,
@@ -97,7 +98,7 @@ $(document).ready(function(){
     })
     var p = $('#ip-private-table').datagrid('getPager');
     $(p).pagination({
-        pageSize:10,
+        pageSize:50,
         pageList:[10,30,50,100],
         beforePageText:'第',
         afterPageText:'页 共 {pages} 页',
@@ -128,6 +129,7 @@ function open_relation_div() {
         rownumbers:true,
         collapsible:true,
         pagination:true,
+        pageSize:50,
         loadMsg:"加载中,请稍候...",
         singleSelect:true,
         striped:true,
@@ -206,7 +208,7 @@ function open_relation_div() {
     })
     var p = $('#ip-relation').datagrid('getPager');
     $(p).pagination({
-        pageSize:10,
+        pageSize:50,
         pageList:[10,30,50,100],
         beforePageText:'第',
         afterPageText:'页 共 {pages} 页',
@@ -250,6 +252,7 @@ function open_public_table() {
         rownumbers:true,
         collapsible:true,
         pagination:true,
+        pageSize:50,
         loadMsg:"加载中,请稍候...",
         singleSelect:true,
         striped:true,
@@ -336,7 +339,7 @@ function open_public_table() {
     })
     var p = $('#ip-public-table').datagrid('getPager');
     $(p).pagination({
-        pageSize:10,
+        pageSize:50,
         pageList:[10,30,50,100],
         beforePageText:'第',
         afterPageText:'页 共 {pages} 页',
@@ -379,7 +382,6 @@ function ip_add_submit() {
                     alert("添加成功!")
                     $('#ip-add').dialog('close')
                     $('#ip-private-table').datagrid('reload')
-                    $('#ip-public-table').datagrid('reload')
                 } else {alert("添加失败，请重试!")}
             })
     } else {
@@ -394,7 +396,7 @@ function ip_add_cancel() {
 function open_update_window(upid,tableid) {
     var v = $(tableid).datagrid('getSelected')
     if (v) {
-        if (v['status'] == '不可用') {
+        if (v['status'] == '禁用') {
             $.messager.confirm('启用提示', '该IP为禁用状态<br><br>是否现在启用', function(r){
                 if (r) {
                     $.post('/resource/update-ip/',
@@ -404,7 +406,6 @@ function open_update_window(upid,tableid) {
                                 alert('修改成功')
                                 $('#ip-private-update').dialog('close')
                                 $('#ip-private-table').datagrid('reload')
-                                $('#ip-public-table').datagrid('reload')
                                 return
                             } else {
                                 alert('修改失败，请重试!')
@@ -439,7 +440,6 @@ function ip_update_submit() {
                 alert('修改成功')
                 $('#ip-private-update').dialog('close')
                 $('#ip-private-table').datagrid('reload')
-                $('#ip-public-table').datagrid('reload')
             } else {alert('修改失败，请重试!')}
         })
 }
@@ -456,7 +456,6 @@ function ip_update_disable() {
                 alert('成功禁用该IP！')
                 $('#ip-private-update').dialog('close')
                 $('#ip-private-table').datagrid('reload')
-                $('#ip-public-table').datagrid('reload')
             }
         })
 }

@@ -4,9 +4,10 @@ from ommp.celery import app
 import threading
 from ommp.resources.base import local, get_datetime
 import os
-import datetime
+import datetime, time
 from hashlib import md5
 from ommp.models import Task_logs
+import salt.client as client
 
 class DeployThreads(threading.Thread):
     '''mut-thread hand deploy'''
@@ -21,27 +22,43 @@ class DeployThreads(threading.Thread):
         source_dir = os.path.abspath(self.kwargs['source_dir'])
         exclude_files = self.kwargs['exclude_files']
         after_operations = self.kwargs['after_operations']
-        temporary_dir = os.path.abspath(self.kwargs['temporary_dir'])
+        temporary_dir = self.kwargs['temporary_dir']
         addition_args = self.kwargs['addition_args']
         task = self.kwargs['task_id']
         
+        local_command = ';'.join(after_operations.strip().split('\r\n'))
         
-        command = 'rsync -azx '
+        command = 'cd %s;rsync -azx ' % source_dir
         if addition_args:
-            command += str(addition_args)
+            command += addition_args
             
         if exclude_files:
-            exclude_file_list =[os.path.join(source_dir, x) for x in exclude_files.split('\n')]
+            exclude_file_list = [x for x in exclude_files.split('\r\n') if x]
             exclude = ' --exclude ' + ' --exclude '.join(exclude_file_list)
-            command += str(exclude)
+            command += exclude
             
         for h in hosts:
-            command += ' %s/ %s:%s' % (source_dir, h, target_dir)
-            out, err = local(command)
-            if err:
-                status = '%s:%s' % (h, err)
+            
+            th = h[0]
+            host_name = h[1]
+            
+            if temporary_dir:
+                tdir = os.path.abspath(temporary_dir)
+                command += ' ./ %s:%s' % (th, tdir)
+                out, err = local(command)
+                
+                com = 'cd %s;rsync -azx %s %s ./ %s;' % (tdir, addition_args, exclude, target_dir)
+                com += local_command
+                exc_command_re = _exec_remote_command(host_name, com)['stderr']
             else:
-                status = '%s:Done' % (h)
+                command += ' ./ %s:%s' % (th, target_dir)
+                out, err = local(command)
+                exc_command_re = _exec_remote_command(host_name, local_command)['stderr']
+
+            if err or exc_command_re:
+                status = '\n%s:%s\n%s' % (th, err, exc_command_re)
+            else:
+                status = '\n%s:Done' % (th)
                 
             if mutex.acquire(1):
                 try:
@@ -51,14 +68,17 @@ class DeployThreads(threading.Thread):
                 finally:
                     mutex.release()
         
-        
-        
-#        if temporary_dir:
-#            target_dir = temporary_dir
-            
+
                 
     
 mutex = threading.Lock()
+
+
+def _exec_remote_command(host_name, command):
+        cl = client.LocalClient()
+        re = cl.cmd(host_name,'cmd.run_all',[command],expr_form='list')
+        return re[host_name]
+
     
 def _sync_status_detail_db(task_id, **kwargs):
     if task_id:    
@@ -109,9 +129,8 @@ def _do_backup(project, source_dir, backup_dir):
         
     
     source_father = os.path.abspath(os.path.join(source_dir, '..'))
-    t = source_dir.split('/')
-    source_file_name = t[-1] if t[-1] else t[-2]
-    command = 'cd %s;tar -zcf %s %s' % (source_father, back_file, source_file_name)
+    source_base_name = os.path.basename(os.path.abspath(source_dir))
+    command = 'cd %s;tar -zcf %s %s' % (source_father, back_file, source_base_name)
     out, err = local(command)
     return out, err, back_file
 
@@ -147,7 +166,10 @@ def start_deploy(config):
     addition_args = config['addition_args']
 
     start_time = get_datetime()
-    _sync_status_detail_db(task, start_time = start_time)
+    _sync_status_detail_db(task, 
+                           start_time = start_time,
+                           status_code = '1',
+                           )
     
     if config['is_backup'] == '1':
         
@@ -156,14 +178,13 @@ def start_deploy(config):
         if not err:
             file_code = get_file_validate_code(file)
             _sync_status_detail_db(task, 
-                                   status_code = '1',
                                    back_file = file,
                                    back_file_code = file_code,
                                    status = 'backup:success\nbackup_file:%s' % file
                                    )
         else:
             _sync_status_detail_db(task, 
-                                   status = 'backup failed!'
+                                   status = 'backup: Failed \n backup_detail: %s' %(err)
                                    )
     else:
         pass
@@ -188,12 +209,11 @@ def start_deploy(config):
                                        temporary_dir = temporary_dir,
                                        )
         deploy_thread.start()
-        
-        if i == h_length - 1:
-            deploy_thread.join()
-        
+
+    while threading.activeCount() >1:
+        time.sleep(1)
     end_time = get_datetime()
-    _sync_status_detail_db(task, end_time = end_time, status_code = 4)
+    _sync_status_detail_db(task, status = 'task: All Done', end_time = end_time, status_code = 4)
 
 
 
