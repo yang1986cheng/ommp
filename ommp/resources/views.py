@@ -344,7 +344,6 @@ def update_server(request):
     size = po.get('svr-size', '')
     parts = po.get('svr-parts', '')
     end_date = po.get('svr-end-date', '')
-    father = po.get('svr-update-father', '')
     used_type = po.get('svr-update-usable', '')
     admin = po.get('svr-update-admin', '')
     os = po.get('svr-update-os', '')
@@ -353,7 +352,7 @@ def update_server(request):
     
     father = Servers.objects.get(id = father) if father else None
         
-    if not base.check_post_val(svr_id, name, idc, size, parts, end_date, used_type, admin, os, hostname, username):
+    if not base.check_post_val(svr_id, name, idc, size, parts, used_type, admin, os, hostname, username):
         raise Http404
     
     idc = IDCs.objects.get(id = idc)
@@ -366,7 +365,6 @@ def update_server(request):
     svr.size = size
     svr.parts = parts
     svr.end_date = end_date
-    svr.father = father
     svr.used_type = used_type
     svr.admin = admin
     svr.os = os
@@ -752,7 +750,7 @@ def get_ips(request):
             if ip.status == 0:
                 status = '可用'
             elif ip.status == 1:
-                status = '禁用'
+                status = '保留'
             else: status = '已使用'
             
             if ip.servers == None:

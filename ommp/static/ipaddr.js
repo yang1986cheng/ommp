@@ -396,8 +396,8 @@ function ip_add_cancel() {
 function open_update_window(upid,tableid) {
     var v = $(tableid).datagrid('getSelected')
     if (v) {
-        if (v['status'] == '禁用') {
-            $.messager.confirm('启用提示', '该IP为禁用状态<br><br>是否现在启用', function(r){
+        if (v['status'] == '保留') {
+            $.messager.confirm('启用提示', '该IP为保留状态<br><br>是否现在启用', function(r){
                 if (r) {
                     $.post('/resource/update-ip/',
                         {"status" : '0', "up-ip-id" : v['ip-id'], "ip-up-comment" : v['ip-comment']},
@@ -453,7 +453,7 @@ function ip_update_disable() {
         {"status" : '1', "up-ip-id" : $('#ip-up-addr-id').val(), "ip-up-comment" : $('#ip-up-comment').val()},
         function(data, status) {
             if (status == 'success' && data['status'] == 'success') {
-                alert('成功禁用该IP！')
+                alert('成功保留该IP！')
                 $('#ip-private-update').dialog('close')
                 $('#ip-private-table').datagrid('reload')
             }
