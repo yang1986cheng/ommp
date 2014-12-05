@@ -87,6 +87,17 @@ $(document).ready(function(){
             },
             {field:'admin-name', title:'负责人', width:20}
         ]],
+        rowStyler:function(index, row){
+            var timeend = new Date(row['end-date'])
+            var timenow = new Date()
+            var days = (timeend - timenow) / 1000 / 3600 / 24
+            if (days < 30) {
+                if (days < 15) {
+                    return 'background-color:red;';
+                }
+                return 'background-color:yellow;';
+            }
+        },
         onSelect:function(rowIndex, rowData) {
             $('#btn-update').linkbutton('enable')
             $('#btn-del').linkbutton('enable')

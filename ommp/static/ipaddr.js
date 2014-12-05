@@ -23,11 +23,18 @@ $(document).ready(function(){
             {field:'ip-name', title:'IP', width:60},
             {field:'idc-name', title:'所在机房', width:40},
             {field:'svr-name', title:'分配服务器', width:50},
-//            {field:'pro-name', title:'所属项目', width:40},
-//            {field:'used-for', title:'用途', width:40},
-            {field:'status', title:'状态', width:20},
+			{
+                field:'status',
+                title:'状态',
+                width:20
+            },
             {field:'ip-comment', title:'备注', width:40}
         ]],
+        rowStyler:function(index, row) {
+            if (row.status == '保留') {
+                return 'background-color:#D7D7D7;';
+            }
+        },
         onSelect:function(rowIndex, rowData) {
             $('#btn-update').linkbutton('enable')
             $('#btn-del').linkbutton('enable')
